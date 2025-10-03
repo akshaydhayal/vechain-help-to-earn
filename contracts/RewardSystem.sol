@@ -74,7 +74,7 @@ contract RewardSystem is Ownable, ReentrancyGuard {
         uint256 change
     );
     
-    constructor(address _questionManager) Ownable(msg.sender) {
+    constructor(address _questionManager) Ownable() {
         questionManager = QuestionManager(_questionManager);
     }
     
