@@ -3,12 +3,12 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useSimpleVeWorldWallet } from '@/hooks/useSimpleVeWorldWallet'
+import { useVeWorldWalletAdvanced } from '@/hooks/useVeWorldWalletAdvanced'
 import { formatAddress } from '@/lib/utils'
 import { Wallet, LogOut, User, AlertCircle, ExternalLink } from 'lucide-react'
 
 export function WalletConnect() {
-  const { isConnected, account, connect, disconnect, isLoading, error } = useSimpleVeWorldWallet()
+  const { isConnected, account, connect, disconnect, isLoading, error } = useVeWorldWalletAdvanced()
   const [isConnecting, setIsConnecting] = useState(false)
 
   const handleConnect = async () => {
