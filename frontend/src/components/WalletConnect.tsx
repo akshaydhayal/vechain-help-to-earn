@@ -3,12 +3,12 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useSimpleWallet } from '@/hooks/useSimpleWallet'
+import { useSimpleVeWorldWallet } from '@/hooks/useSimpleVeWorldWallet'
 import { formatAddress } from '@/lib/utils'
 import { Wallet, LogOut, User, AlertCircle, ExternalLink } from 'lucide-react'
 
 export function WalletConnect() {
-  const { isConnected, account, connect, disconnect, isLoading, error } = useSimpleWallet()
+  const { isConnected, account, connect, disconnect, isLoading, error } = useSimpleVeWorldWallet()
   const [isConnecting, setIsConnecting] = useState(false)
 
   const handleConnect = async () => {
@@ -73,16 +73,16 @@ export function WalletConnect() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Wallet className="h-5 w-5" />
-            Connect Wallet (Demo Mode)
+            Connect Your VeWorld Wallet
           </CardTitle>
           <CardDescription>
-            Demo mode: Connect to explore the platform features. In production, this will connect to VeWorld wallet.
+            Connect your VeWorld wallet to start asking questions, answering, and earning B3TR rewards
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={handleConnect} disabled={isConnecting} className="w-full">
             <Wallet className="mr-2 h-4 w-4" />
-            {isConnecting ? 'Connecting...' : 'Connect Wallet (Demo)'}
+            {isConnecting ? 'Connecting...' : 'Connect VeWorld Wallet'}
           </Button>
         </CardContent>
       </Card>
