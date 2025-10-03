@@ -7,12 +7,12 @@ import { WalletConnect } from '@/components/WalletConnect'
 import { QuestionCard } from '@/components/QuestionCard'
 import { AskQuestionModal } from '@/components/AskQuestionModal'
 import { StatsCard } from '@/components/StatsCard'
-import { useVeChainKit } from '@/hooks/useVeChainKit'
+import { useSimpleWallet } from '@/hooks/useSimpleWallet'
 import { useContract } from '@/hooks/useContract'
 import { Plus, Search, Filter, TrendingUp, Clock } from 'lucide-react'
 
 export default function Home() {
-  const { isConnected, account, provider, signer } = useVeChainKit()
+  const { isConnected, account, provider, signer } = useSimpleWallet()
   const { mainContract, platformStats, getPlatformStats } = useContract(provider, signer)
   const [questions, setQuestions] = useState<any[]>([])
   const [showAskModal, setShowAskModal] = useState(false)

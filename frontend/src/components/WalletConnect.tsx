@@ -1,13 +1,26 @@
 'use client'
 
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useVeChainKit } from '@/hooks/useVeChainKit'
+import { useSimpleWallet } from '@/hooks/useSimpleWallet'
 import { formatAddress } from '@/lib/utils'
-import { Wallet, LogOut, User } from 'lucide-react'
+import { Wallet, LogOut, User, AlertCircle, ExternalLink } from 'lucide-react'
 
 export function WalletConnect() {
-  const { isConnected, account, connect, disconnect, isLoading } = useVeChainKit()
+  const { isConnected, account, connect, disconnect, isLoading, error } = useSimpleWallet()
+  const [isConnecting, setIsConnecting] = useState(false)
+
+  const handleConnect = async () => {
+    setIsConnecting(true)
+    try {
+      await connect()
+    } catch (error) {
+      console.error('Connection failed:', error)
+    } finally {
+      setIsConnecting(false)
+    }
+  }
 
   if (isLoading) {
     return (
@@ -21,22 +34,55 @@ export function WalletConnect() {
     )
   }
 
+  if (error && !isConnected) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-destructive">
+            <AlertCircle className="h-5 w-5" />
+            Wallet Error
+          </CardTitle>
+          <CardDescription>
+            {error}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+            <p className="text-sm text-destructive">
+              Please make sure you have VeWorld wallet installed and try again.
+            </p>
+          </div>
+          <Button onClick={handleConnect} disabled={isConnecting} className="w-full">
+            <Wallet className="mr-2 h-4 w-4" />
+            {isConnecting ? 'Connecting...' : 'Retry Connection'}
+          </Button>
+          <Button variant="outline" asChild className="w-full">
+            <a href="https://veworld.net/" target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="mr-2 h-4 w-4" />
+              Install VeWorld Wallet
+            </a>
+          </Button>
+        </CardContent>
+      </Card>
+    )
+  }
+
   if (!isConnected) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Wallet className="h-5 w-5" />
-            Connect Your VeWorld Wallet
+            Connect Wallet (Demo Mode)
           </CardTitle>
           <CardDescription>
-            Connect your VeWorld wallet to start asking questions, answering, and earning B3TR rewards
+            Demo mode: Connect to explore the platform features. In production, this will connect to VeWorld wallet.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button onClick={connect} className="w-full">
+          <Button onClick={handleConnect} disabled={isConnecting} className="w-full">
             <Wallet className="mr-2 h-4 w-4" />
-            Connect VeWorld Wallet
+            {isConnecting ? 'Connecting...' : 'Connect Wallet (Demo)'}
           </Button>
         </CardContent>
       </Card>

@@ -3,20 +3,32 @@
 import { useEffect, useState } from 'react'
 import { ethers } from 'ethers'
 
-export function useVeChainKit() {
+// VeWorld wallet interface
+interface VeWorldWallet {
+  request: (method: string, params?: any[]) => Promise<any>
+  on: (event: string, callback: (data: any) => void) => void
+  removeListener: (event: string, callback: (data: any) => void) => void
+}
+
+export function useVeWorldWallet() {
   const [provider, setProvider] = useState<ethers.Provider | null>(null)
   const [signer, setSigner] = useState<ethers.Signer | null>(null)
   const [isConnected, setIsConnected] = useState(false)
   const [account, setAccount] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [veWorldWallet, setVeWorldWallet] = useState<VeWorldWallet | null>(null)
 
   useEffect(() => {
-    const initProvider = async () => {
+    const initWallet = async () => {
       try {
         // Check if VeWorld wallet is available
         if (typeof window !== 'undefined' && (window as any).vechain) {
-          const provider = new ethers.BrowserProvider((window as any).vechain)
+          const wallet = (window as any).vechain as VeWorldWallet
+          setVeWorldWallet(wallet)
+          
+          // Create provider
+          const provider = new ethers.BrowserProvider(wallet)
           setProvider(provider)
           
           // Check if already connected
@@ -35,35 +47,44 @@ export function useVeChainKit() {
           setError('VeWorld wallet not found. Please install VeWorld wallet.')
         }
       } catch (error) {
-        console.error('Failed to initialize provider:', error)
+        console.error('Failed to initialize wallet:', error)
         setError('Failed to initialize wallet connection')
       } finally {
         setIsLoading(false)
       }
     }
 
-    initProvider()
+    initWallet()
   }, [])
 
   const connect = async () => {
-    if (!provider) {
+    if (!veWorldWallet) {
       throw new Error('VeWorld wallet not found. Please install VeWorld wallet.')
     }
 
     try {
       setError(null)
-      // Use the correct method for VeWorld wallet
-      const accounts = await provider.send('eth_requestAccounts', [])
+      setIsLoading(true)
+      
+      // Use VeWorld specific connection method
+      const accounts = await veWorldWallet.request('eth_requestAccounts', [])
+      
       if (accounts && accounts.length > 0) {
         setIsConnected(true)
         setAccount(accounts[0])
-        setSigner(await provider.getSigner())
+        
+        if (provider) {
+          setSigner(await provider.getSigner())
+        }
+        
         return accounts[0]
       }
     } catch (error: any) {
       console.error('Failed to connect wallet:', error)
       setError(error.message || 'Failed to connect wallet')
       throw error
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -73,6 +94,25 @@ export function useVeChainKit() {
     setSigner(null)
     setError(null)
   }
+
+  // Listen for account changes
+  useEffect(() => {
+    if (veWorldWallet && isConnected) {
+      const handleAccountsChanged = (accounts: string[]) => {
+        if (accounts.length === 0) {
+          disconnect()
+        } else {
+          setAccount(accounts[0])
+        }
+      }
+
+      veWorldWallet.on('accountsChanged', handleAccountsChanged)
+      
+      return () => {
+        veWorldWallet.removeListener('accountsChanged', handleAccountsChanged)
+      }
+    }
+  }, [veWorldWallet, isConnected])
 
   return {
     provider,
