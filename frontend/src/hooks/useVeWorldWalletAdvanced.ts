@@ -12,6 +12,15 @@ export function useVeWorldWalletAdvanced() {
   useEffect(() => {
     setMounted(true)
     setIsLoading(false)
+    
+    // Check if wallet is already connected
+    if (typeof window !== 'undefined' && (window as any).vechain) {
+      const wallet = (window as any).vechain
+      if (wallet.selectedAddress) {
+        setIsConnected(true)
+        setAccount(wallet.selectedAddress)
+      }
+    }
   }, [])
 
   const connect = async () => {
