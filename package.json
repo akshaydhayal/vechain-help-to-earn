@@ -1,0 +1,25 @@
+{
+  "name": "vechain-demo-contract",
+  "version": "1.0.0",
+  "description": "Demo Solidity smart contract for VeChain testnet deployment",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy": "hardhat run scripts/deploy.js --network vechain_testnet",
+    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
+    "test": "hardhat test",
+    "clean": "hardhat clean"
+  },
+  "keywords": ["vechain", "solidity", "blockchain", "smart-contract"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@vechain/sdk-hardhat-plugin": "^2.0.4",
+    "hardhat": "^2.19.0",
+    "dotenv": "^16.3.1"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.0"
+  }
+}
