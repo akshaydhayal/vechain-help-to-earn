@@ -1,25 +1,30 @@
 'use client';
 
-import { useWallet, useWalletModal } from '@vechain/vechain-kit';
+import { useWallet } from './ClientOnlyVeChainKit';
+import { useState, useEffect } from 'react';
 
 export function WalletConnect() {
-  const { connection, account, disconnect } = useWallet();
-  const { open: openWalletModal } = useWalletModal();
+  const { account, isConnected, connect, disconnect, isVeWorldAvailable } = useWallet();
+  const [isClient, setIsClient] = useState(false);
 
-  if (connection.isLoading) {
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
     return (
       <div className="px-4 py-2 bg-gray-100 rounded-lg">
-        <span className="text-sm text-gray-600">Connecting...</span>
+        <span className="text-sm text-gray-600">Loading...</span>
       </div>
     );
   }
 
-  if (connection.isConnected && account) {
+  if (isConnected && account) {
     return (
       <div className="flex items-center gap-4">
         <div className="px-4 py-2 bg-green-100 rounded-lg">
           <span className="text-sm text-green-600">
-            Connected: {account.address.slice(0, 6)}...{account.address.slice(-4)}
+            Connected: {account.slice(0, 6)}...{account.slice(-4)}
           </span>
         </div>
         <button
@@ -32,12 +37,22 @@ export function WalletConnect() {
     );
   }
 
+  if (!isVeWorldAvailable) {
+    return (
+      <div className="px-4 py-2 bg-yellow-100 rounded-lg">
+        <span className="text-sm text-yellow-600">
+          VeWorld wallet not detected
+        </span>
+      </div>
+    );
+  }
+
   return (
     <button
-      onClick={openWalletModal}
+      onClick={connect}
       className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
     >
-      Connect Wallet
+      Connect VeWorld Wallet
     </button>
   );
 }

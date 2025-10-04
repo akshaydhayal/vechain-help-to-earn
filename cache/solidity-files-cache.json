@@ -1,9 +1,9 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "/home/akshay/veChain/quora/contracts/SimpleQA.sol": {
-      "lastModificationDate": 1759537982385,
-      "contentHash": "fb4728414e2ce902156e76d1cf0c730e",
+    "C:\\Users\\TIS\\Documents\\Akshay\\vechain-quora\\contracts\\SimpleQA.sol": {
+      "lastModificationDate": 1759572799778,
+      "contentHash": "1deb63e257c705f5197d8ff4d171980d",
       "sourceName": "contracts/SimpleQA.sol",
       "solcConfig": {
         "version": "0.8.20",

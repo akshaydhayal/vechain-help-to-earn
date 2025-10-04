@@ -1,223 +1,247 @@
-# VeChain Quora - X-to-Earn Q&A Platform
+# 🚀 VeChain Q&A Platform - Hackathon Project
 
-A decentralized Q&A platform built on VeChain blockchain that rewards users for asking quality questions and providing helpful answers. Integrated with VeBetter DAO for B3TR token rewards and designed for the VeChain Global Hackathon.
+A decentralized Q&A platform built on VeChain blockchain with VeBetterDAO integration for rewards distribution.
 
-## 🚀 Features
+## ✨ Features
 
-- **X-to-Earn Rewards**: Earn B3TR tokens for quality questions and answers
-- **Anti-Farming Mechanisms**: Prevents reward farming with reputation and time-based limits
-- **User Reputation System**: Build reputation through quality contributions
-- **VET Bounty System**: Ask questions with VET bounties for best answers
-- **VeWorld Wallet Integration**: Seamless wallet connection and transactions
-- **AI-Powered Features**: Content moderation and quality assessment
-- **Sustainability Focus**: Knowledge sharing for environmental and social impact
+- **Ask Questions** with VET bounties
+- **Submit Answers** to earn rewards
+- **Upvote System** for community-driven quality
+- **Reputation Tracking** for users
+- **VeBetterDAO Integration** for B3TR token rewards
+- **Anti-farming Mechanisms** to prevent abuse
+- **Modern Frontend** with VeChain Kit integration
 
-## 📋 Prerequisites
+## 🏗️ Project Structure
 
-- Node.js (v16 or higher)
-- npm or yarn
-- VeChain testnet VET tokens (for gas fees)
+```
+vechain-quora/
+├── contracts/           # Solidity smart contracts
+│   └── SimpleQA.sol    # Main Q&A contract
+├── scripts/            # Deployment and testing scripts
+│   ├── deploy-simple-qa.js
+│   ├── demo-simple-qa.js
+│   ├── test-simple-qa.js
+│   └── test-simple.js
+├── frontend/           # Next.js frontend application
+│   ├── src/
+│   │   ├── app/
+│   │   └── components/
+│   └── package.json
+├── artifacts/          # Compiled contract artifacts
+├── cache/             # Hardhat cache
+└── package.json       # Main project dependencies
+```
+
+## 🚀 Quick Start
+
+### 1. Prerequisites
+
+- Node.js (v18 or higher)
+- VET tokens on VeChain testnet
 - Private key with VET tokens
 
-## 🛠️ Installation
+### 2. Installation
 
-1. **Clone or download this project**
-   ```bash
-   cd vechain-demo-contract
-   ```
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd vechain-quora
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+# Install dependencies
+npm install
 
-3. **Set up environment variables**
-   ```bash
-   cp env.example .env
-   ```
-   
-   Edit `.env` file and add your private key:
-   ```
-   PRIVATE_KEY=your_private_key_here
-   ```
+# Install frontend dependencies
+cd frontend
+npm install
+cd ..
+```
 
-## 🔧 Configuration
+### 3. Environment Setup
 
-### Network Configuration
+Create a `.env` file in the root directory:
 
-The project is pre-configured for VeChain testnet with the following settings:
+```bash
+# Copy the example file
+cp env.example .env
+```
 
-- **Network**: VeChain Testnet
-- **RPC URL**: https://testnet.vechain.org
-- **Chain ID**: 39 (0x27)
-- **Solidity Version**: 0.8.20
+Edit `.env` and add your private key:
+```env
+PRIVATE_KEY=your_private_key_here_without_0x_prefix
+```
 
-### Contract Architecture
-
-- **VeChainQuora**: Main contract that integrates all components
-- **QuestionManager**: Handles questions, answers, and user interactions
-- **RewardSystem**: Manages B3TR token distribution and anti-farming
-- **Anti-Farming**: Time-based limits, reputation requirements, and engagement scoring
-
-## 🚀 Deployment
-
-### 1. Get Testnet VET Tokens
-
-Before deploying, you need VET tokens for gas fees:
-
-1. Visit [VeChain Testnet Faucet](https://faucet.vecha.in/)
-2. Enter your wallet address
-3. Claim testnet VET tokens
-
-### 2. Compile the Contract
+### 4. Compile Contracts
 
 ```bash
 npm run compile
 ```
 
-### 3. Deploy to VeChain Testnet
+### 5. Test Locally
+
+```bash
+npm run test:local
+```
+
+### 6. Deploy to VeChain Testnet
 
 ```bash
 npm run deploy
 ```
 
-This will:
-- Deploy the contract to VeChain testnet
-- Display contract address and deployment info
-- Save deployment details to `deployment-info.json`
-
-### 4. Verify Deployment
-
-After deployment, you can verify your contract on:
-- [VeChain Testnet Explorer](https://explore-testnet.vechain.org/)
-
-## 🧪 Testing & Interaction
-
-### Interact with Deployed Contract
+### 7. Start Frontend
 
 ```bash
-node scripts/interact.js
+npm run frontend:dev
 ```
 
-This script will:
-- Load your deployed contract
-- Display contract information
-- Perform example interactions
-- Show your token balance
+## 🎯 Usage
 
-### Manual Contract Interaction
+### For Developers
 
-You can interact with your contract using:
+```bash
+# Compile contracts
+npm run compile
 
-1. **VeChain Explorer**: Use the contract address to view and interact
-2. **Hardhat Console**: 
-   ```bash
-   npx hardhat console --network vechain_testnet
-   ```
-3. **Custom Scripts**: Create your own interaction scripts
+# Test locally
+npm run test:local
 
-## 📊 Contract Functions
+# Deploy to testnet
+npm run deploy
 
-### QuestionManager Functions
-- `askQuestion(title, content, tags, bounty)` - Ask a question with VET bounty
-- `postAnswer(questionId, content)` - Answer a question
+# Run demo
+npm run demo
+
+# Start frontend development
+npm run frontend:dev
+```
+
+### For Users
+
+1. **Connect VeChain Wallet** using VeChain Kit
+2. **Ask Questions** with optional VET bounties
+3. **Submit Answers** to earn rewards
+4. **Upvote Answers** to increase reputation
+5. **Approve Best Answers** (if you asked the question)
+
+## 🔧 Smart Contract Functions
+
+### Core Functions
+
+- `askQuestion(title, description)` - Ask a question with optional bounty
+- `submitAnswer(questionId, content)` - Submit an answer
 - `upvoteAnswer(answerId)` - Upvote an answer
-- `approveAnswer(questionId, answerId)` - Approve best answer
+- `approveAnswer(answerId)` - Approve best answer (question asker only)
+
+### View Functions
+
 - `getQuestion(questionId)` - Get question details
-- `getUserProfile(user)` - Get user profile and reputation
+- `getAnswer(answerId)` - Get answer details
+- `getUser(address)` - Get user statistics
+- `getPlatformStats()` - Get platform statistics
 
-### RewardSystem Functions
-- `distributeRewards(user, activityType, engagementScore)` - Distribute B3TR rewards
-- `claimRewards()` - Claim pending B3TR rewards
-- `getUserRewardInfo(user)` - Get user reward information
-- `calculateEngagementScore(user)` - Calculate user engagement score
+## 🌐 Network Configuration
 
-### Anti-Farming Mechanisms
-- **Time Limits**: Minimum intervals between questions/answers
-- **Daily Limits**: Maximum questions/answers per day
-- **Reputation Requirements**: Minimum reputation to ask questions
-- **Engagement Scoring**: Rewards based on quality and engagement
-- **Verified Users**: Bonus rewards for verified users
+### VeChain Testnet
+- **RPC URL:** https://testnet.vechain.org
+- **Chain ID:** 39
+- **Explorer:** https://explore-testnet.vechain.org
 
-## 🔍 Platform Features
+### VeChain Mainnet
+- **RPC URL:** https://mainnet.vechain.org
+- **Chain ID:** 74
+- **Explorer:** https://explore.vechain.org
 
-### User Journey
-1. **Register**: Connect VeWorld wallet and register on platform
-2. **Ask Questions**: Post questions with VET bounties and tags
-3. **Answer Questions**: Provide helpful answers to earn rewards
-4. **Engage**: Upvote/downvote answers, approve best answers
-5. **Earn Rewards**: Receive B3TR tokens from VeBetter DAO
-6. **Build Reputation**: Increase reputation through quality contributions
+## 🎁 Rewards System
 
-### Reward Mechanism
-- **Base Rewards**: Earn B3TR for quality answers
-- **Approved Answers**: 3x multiplier for approved answers
-- **High Engagement**: 2x multiplier for high engagement
-- **Verified Users**: 1.5x multiplier for verified users
-- **Reputation Bonus**: Higher reputation = higher rewards
+### VET Bounties
+- Question askers can attach VET bounties
+- Approved answerers receive the full bounty
+- Automatic distribution via smart contract
 
-## 📁 Project Structure
+### B3TR Tokens
+- Integrated with VeBetterDAO X2Earn system
+- 5 B3TR tokens per approved answer
+- Automatic distribution via smart contract
 
+## 🛠️ Development
+
+### Contract Development
+
+```bash
+# Compile contracts
+npx hardhat compile
+
+# Run tests
+npx hardhat test
+
+# Deploy to local network
+npx hardhat run scripts/deploy-simple-qa.js --network localhost
 ```
-vechain-quora/
-├── contracts/
-│   ├── VeChainQuora.sol         # Main platform contract
-│   ├── QuestionManager.sol      # Q&A functionality
-│   └── RewardSystem.sol         # B3TR rewards system
-├── scripts/
-│   ├── deploy.js                # Deployment script
-│   └── interact.js              # Interaction script
-├── hardhat.config.js            # Hardhat configuration
-├── package.json                 # Dependencies
-├── env.example                  # Environment template
-├── deployment-info.json         # Deployment details (generated)
-└── README.md                    # This file
+
+### Frontend Development
+
+```bash
+cd frontend
+npm run dev
 ```
+
+## 📊 Testing
+
+The project includes comprehensive testing:
+
+- **Local Testing:** `npm run test:local`
+- **Testnet Testing:** `npm run test`
+- **Demo Script:** `npm run demo`
+
+## 🔗 Integration
+
+### VeChain Kit
+The frontend uses VeChain Kit for wallet connection and transaction handling.
+
+### VeBetterDAO
+The contract integrates with VeBetterDAO for B3TR token rewards distribution.
 
 ## 🚨 Important Notes
 
-1. **Private Key Security**: Never commit your private key to version control
-2. **Testnet Only**: This is configured for VeChain testnet only
-3. **Gas Fees**: Ensure you have sufficient VET for gas fees
-4. **Contract Verification**: Consider verifying your contract on VeChain Explorer
+1. **Private Key Security:** Never commit your private key to version control
+2. **Testnet Tokens:** Get VET testnet tokens from VeChain faucet
+3. **Gas Fees:** VeChain has very low gas fees compared to Ethereum
+4. **VeBetterDAO Integration:** Currently using dummy addresses for testing
 
 ## 🔗 Useful Links
 
 - [VeChain Documentation](https://docs.vechain.org/)
-- [VeChain Testnet Explorer](https://explore-testnet.vechain.org/)
+- [VeChain Kit Documentation](https://kit.vecha.in/)
+- [VeBetterDAO](https://vebetterdao.org/)
 - [VeChain Testnet Faucet](https://faucet.vecha.in/)
-- [Hardhat Documentation](https://hardhat.org/docs)
 
-## 📞 Support
+## 🐛 Troubleshooting
 
-If you encounter any issues:
+### Common Issues
 
-1. Check your private key configuration
-2. Ensure you have sufficient VET for gas fees
-3. Verify network connectivity
-4. Check VeChain testnet status
+1. **"Insufficient funds"** - Make sure you have VET tokens
+2. **"Network not found"** - Check your network configuration
+3. **"Contract not deployed"** - Run `npm run deploy` first
 
-## 🎉 Success!
+### Getting Help
 
-Once deployed, you'll have a fully functional VeChain Quora platform on testnet that enables:
+- Check the console for error messages
+- Verify your private key is correct
+- Ensure you have VET tokens for gas fees
 
-### For Users:
-- **Ask Questions**: Post questions with VET bounties and tags
-- **Answer Questions**: Provide helpful answers and earn B3TR rewards
-- **Build Reputation**: Increase reputation through quality contributions
-- **Earn Rewards**: Receive B3TR tokens from VeBetter DAO
+## 🎉 Next Steps
 
-### For Platform:
-- **Anti-Farming**: Prevents reward farming with smart mechanisms
-- **Quality Control**: Reputation system ensures quality content
-- **Sustainability**: Knowledge sharing for environmental and social impact
-- **Mass Adoption**: Scalable platform for thousands of users
+1. Deploy your contract to VeChain testnet
+2. Test all functionality
+3. Integrate with real VeBetterDAO addresses
+4. Customize the frontend
+5. Deploy to mainnet when ready
 
-### Hackathon Alignment:
-- ✅ **Track 1**: Social Impact - Build for People
-- ✅ **AI Integration**: Content moderation and quality assessment
-- ✅ **B3TR Rewards**: VeBetter DAO integration
-- ✅ **VeWorld Wallet**: Seamless user experience
-- ✅ **Sustainability**: Knowledge sharing for impact
+## 📄 License
 
-Perfect for the VeChain Global Hackathon with $30,000 in prizes! 🏆
+MIT License - see LICENSE file for details.
+
+---
+
+**Happy Building! 🚀**

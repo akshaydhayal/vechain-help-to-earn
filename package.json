@@ -9,6 +9,9 @@
     "deploy:local": "hardhat run scripts/deploy-simple-qa.js --network localhost",
     "demo": "hardhat run scripts/demo-simple-qa.js --network vechain_testnet",
     "test": "hardhat run scripts/test-simple-qa.js --network vechain_testnet",
+    "test:local": "hardhat run scripts/test-simple.js --network hardhat",
+    "frontend:dev": "cd frontend && npm run dev",
+    "frontend:build": "cd frontend && npm run build",
     "clean": "hardhat clean"
   },
   "keywords": ["vechain", "solidity", "blockchain", "smart-contract", "qa", "platform"],

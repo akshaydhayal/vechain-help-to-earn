@@ -1,10 +1,27 @@
 'use client';
 
 import { WalletConnect } from '@/components/WalletConnect';
-import { useWallet } from '@vechain/vechain-kit';
+import { useWallet } from '@/components/ClientOnlyVeChainKit';
+import { useState, useEffect } from 'react';
 
 export default function Home() {
-  const { connection, account } = useWallet();
+  const { account, isConnected } = useWallet();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -23,7 +40,7 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {!connection.isConnected ? (
+        {!isConnected ? (
           <div className="text-center py-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               Welcome to VeChain Quora
@@ -66,13 +83,13 @@ export default function Home() {
                 <div>
                   <span className="font-medium text-gray-700">Account:</span>
                   <span className="ml-2 font-mono text-sm bg-gray-100 px-2 py-1 rounded">
-                    {account?.address}
+                    {account}
                     </span>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">Connection Type:</span>
                   <span className="ml-2 text-sm text-green-600">
-                    {connection.source}
+                    VeWorld Wallet
                       </span>
                 </div>
                 <div>
