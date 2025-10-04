@@ -1,11 +1,10 @@
 'use client';
 
-import { useWallet } from '@vechain/vechain-kit';
-import { useDAppKitWalletModal } from '@vechain/vechain-kit';
+import { useWallet, useWalletModal } from '@vechain/vechain-kit';
 
 export function WalletConnect() {
   const { connection, account, disconnect } = useWallet();
-  const { open: openWalletModal } = useDAppKitWalletModal();
+  const { open: openWalletModal } = useWalletModal();
 
   if (connection.isLoading) {
     return (
