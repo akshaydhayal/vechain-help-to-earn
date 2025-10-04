@@ -1,6 +1,7 @@
 'use client';
 
 import { WalletConnect } from '@/components/WalletConnect';
+import { QAInterface } from '@/components/QAInterface';
 import { useWallet } from '@/components/ClientOnlyVeChainKit';
 import { useState, useEffect } from 'react';
 
@@ -74,32 +75,35 @@ export default function Home() {
           </div>
         ) : (
           <div className="space-y-8">
-            {/* Connected State */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                🎉 Wallet Connected Successfully!
-              </h2>
-              <div className="space-y-4">
-                <div>
-                  <span className="font-medium text-gray-700">Account:</span>
-                  <span className="ml-2 font-mono text-sm bg-gray-100 px-2 py-1 rounded">
-                    {account}
-                    </span>
-                </div>
-                <div>
-                  <span className="font-medium text-gray-700">Connection Type:</span>
-                  <span className="ml-2 text-sm text-green-600">
-                    VeWorld Wallet
+                {/* Connected State */}
+                <div className="bg-white rounded-lg shadow-sm border p-6">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                    🎉 Wallet Connected Successfully!
+                  </h2>
+                  <div className="space-y-4">
+                    <div>
+                      <span className="font-medium text-gray-700">Account:</span>
+                      <span className="ml-2 font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                        {account}
                       </span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">Connection Type:</span>
+                      <span className="ml-2 text-sm text-green-600">
+                        VeWorld Wallet
+                      </span>
+                    </div>
+                    <div>
+                      <span className="font-medium text-gray-700">Network:</span>
+                      <span className="ml-2 text-sm text-green-600">
+                        VeChain Testnet
+                      </span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <span className="font-medium text-gray-700">Network:</span>
-                  <span className="ml-2 text-sm text-green-600">
-                    VeChain Testnet
-                  </span>
-                </div>
-              </div>
-            </div>
+
+                {/* Q&A Interface */}
+                <QAInterface />
 
             {/* Next Steps */}
             <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">

@@ -6,6 +6,7 @@ declare global {
         connect: () => Promise<{ account: string; verified: boolean }>;
         signTx: (tx: unknown) => Promise<unknown>;
         signCert: (cert: unknown) => Promise<unknown>;
+        request?: (params: { method: string; params?: unknown[] }) => Promise<string[]>;
       };
       connect?: () => Promise<{ account: string; verified: boolean }>;
       request?: (params: { method: string; params?: unknown[] }) => Promise<string[]>;
