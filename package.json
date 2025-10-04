@@ -1,16 +1,17 @@
 {
-  "name": "vechain-demo-contract",
+  "name": "simple-qa-platform",
   "version": "1.0.0",
-  "description": "Demo Solidity smart contract for VeChain testnet deployment",
+  "description": "Simple Q&A Platform with VeChain integration",
   "main": "index.js",
   "scripts": {
     "compile": "hardhat compile",
-    "deploy": "hardhat run scripts/deploy.js --network vechain_testnet",
-    "deploy:local": "hardhat run scripts/deploy.js --network localhost",
-    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy-simple-qa.js --network vechain_testnet",
+    "deploy:local": "hardhat run scripts/deploy-simple-qa.js --network localhost",
+    "demo": "hardhat run scripts/demo-simple-qa.js --network vechain_testnet",
+    "test": "hardhat run scripts/test-simple-qa.js --network vechain_testnet",
     "clean": "hardhat clean"
   },
-  "keywords": ["vechain", "solidity", "blockchain", "smart-contract"],
+  "keywords": ["vechain", "solidity", "blockchain", "smart-contract", "qa", "platform"],
   "author": "",
   "license": "MIT",
   "devDependencies": {

@@ -1,0 +1,29 @@
+{
+  "contractAddress": "0xed10481bacc6f37bd837715e8972e8b2234f7628",
+  "deployerAddress": "0xdC37d70C79352d6472fd78A5eCCCdA250bcC37d3",
+  "deploymentTime": "2025-10-04T00:31:21.107Z",
+  "network": "vechain_testnet",
+  "contractType": "SimpleQA",
+  "veBetterDAO": {
+    "contractAddress": "0x0000000000000000000000000000000000000000",
+    "appId": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+    "note": "Using dummy addresses for testing"
+  },
+  "platformStats": {
+    "totalQuestions": "1",
+    "totalAnswers": "0",
+    "totalUsers": "1",
+    "contractBalance": "0.1"
+  },
+  "explorerUrl": "https://explore-testnet.vechain.org/transactions/0xed10481bacc6f37bd837715e8972e8b2234f7628",
+  "features": [
+    "Ask questions with VET bounties",
+    "Submit answers to questions",
+    "Upvote answers",
+    "Approve best answers (question asker only)",
+    "Earn VET bounties for approved answers",
+    "Earn B3TR tokens from VeBetterDAO",
+    "User reputation system",
+    "Anti-farming mechanisms"
+  ]
+}
