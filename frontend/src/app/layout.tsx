@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { ClientOnlyVeChainKit } from '@/components/ClientOnlyVeChainKit'
+import { NoSSR } from '@/components/NoSSR'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -18,11 +19,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ClientOnlyVeChainKit>
-          <div className="min-h-screen bg-background">
-            {children}
-          </div>
-        </ClientOnlyVeChainKit>
+        <NoSSR>
+          <ClientOnlyVeChainKit>
+            <div className="min-h-screen bg-background">
+              {children}
+            </div>
+          </ClientOnlyVeChainKit>
+        </NoSSR>
       </body>
     </html>
   )

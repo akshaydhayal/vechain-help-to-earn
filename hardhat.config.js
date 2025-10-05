@@ -21,14 +21,14 @@ module.exports = {
     },
     vechain_testnet: {
       url: "https://testnet.vechain.org",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      accounts: (process.env.PRIVATE_KEY && process.env.PRIVATE_KEY !== 'your_private_key_here') ? [process.env.PRIVATE_KEY] : [],
       chainId: 39,
       gas: 10000000,
       gasPrice: 1000000000
     },
     vechain_mainnet: {
       url: "https://mainnet.vechain.org", 
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      accounts: (process.env.PRIVATE_KEY && process.env.PRIVATE_KEY !== 'your_private_key_here') ? [process.env.PRIVATE_KEY] : [],
       chainId: 74,
       gas: 10000000,
       gasPrice: 1000000000

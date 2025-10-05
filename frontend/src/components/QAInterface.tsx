@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useWallet } from './ClientOnlyVeChainKit';
-import { vechainConnexService } from '@/utils/vechainConnexService';
+import { vechainSDKTransactionService } from '@/utils/simpleTransactionService';
+import { PrivateKeyInput } from './PrivateKeyInput';
 
 interface Question {
   id: number;
@@ -43,17 +44,18 @@ export function QAInterface() {
   // Transaction states
   const [isTransactionPending, setIsTransactionPending] = useState(false);
   const [lastTransactionHash, setLastTransactionHash] = useState<string | null>(null);
+  
+  // Private key input states
+  const [showPrivateKeyInput, setShowPrivateKeyInput] = useState(false);
+  const [pendingTransaction, setPendingTransaction] = useState<{
+    title: string;
+    bounty: string;
+  } | null>(null);
 
   useEffect(() => {
     if (isConnected && account) {
-      // Initialize the VeChain Connex service when wallet connects
-      vechainConnexService.connectWallet().then(() => {
-        console.log('VeChain Connex service initialized with wallet');
-        loadPlatformData();
-      }).catch((error) => {
-        console.error('Failed to initialize VeChain Connex service:', error);
-        setError('Failed to initialize VeChain Connex service. Please try reconnecting your wallet.');
-      });
+      console.log('✅ VeChain SDK wallet connected:', account);
+      loadPlatformData();
     }
   }, [isConnected, account]);
 
@@ -104,18 +106,40 @@ export function QAInterface() {
       return;
     }
 
+    // Show private key input modal for real transaction
+    setPendingTransaction({
+      title: newQuestion,
+      bounty: questionBounty
+    });
+    setShowPrivateKeyInput(true);
+  };
+
+  const handlePrivateKeySubmit = async (privateKey: string) => {
+    if (!pendingTransaction) return;
+
     try {
       setIsTransactionPending(true);
       setError(null);
+      setShowPrivateKeyInput(false);
       
-      console.log('Sending VeChain Connex transaction for askQuestion...');
-      const txHash = await vechainConnexService.askQuestion(newQuestion, questionBounty);
+      console.log('🚀 Sending REAL VeChain testnet transaction via VeChain SDK...');
+      
+      // Use VeChain SDK Transaction Service for real blockchain transactions
+      const txHash = await vechainSDKTransactionService.askQuestion(
+        pendingTransaction.title, 
+        pendingTransaction.bounty, 
+        account, 
+        privateKey
+      );
       
       setLastTransactionHash(txHash);
-      console.log('REAL transaction completed:', txHash);
-      alert(`Question submitted! REAL transaction hash: ${txHash}`);
+      console.log('✅ REAL VeChain testnet transaction sent:', txHash);
+      alert(`✅ Question submitted to VeChain testnet! Transaction: ${txHash.slice(0, 10)}...`);
+      
+      // Clear form
       setNewQuestion('');
       setQuestionBounty('0.1');
+      setPendingTransaction(null);
       
       // Reload data after transaction
       setTimeout(() => {
@@ -140,12 +164,12 @@ export function QAInterface() {
       setIsTransactionPending(true);
       setError(null);
       
-      console.log('Sending VeChain Connex transaction for submitAnswer...');
-      const txHash = await vechainConnexService.submitAnswer(questionId, newAnswer);
+      console.log('🚀 Sending REAL VeChain testnet transaction for submitAnswer via VeChain SDK...');
       
+      const txHash = await vechainSDKTransactionService.submitAnswer(questionId, newAnswer, account);
       setLastTransactionHash(txHash);
-      console.log('REAL transaction completed:', txHash);
-      alert(`Answer submitted! REAL transaction hash: ${txHash}`);
+      console.log('✅ REAL VeChain testnet transaction sent:', txHash);
+      alert(`Answer submitted to VeChain testnet! Transaction: ${txHash.slice(0, 10)}...`);
       setNewAnswer('');
       setSelectedQuestionId(null);
       
@@ -167,21 +191,21 @@ export function QAInterface() {
       setIsTransactionPending(true);
       setError(null);
       
-      console.log('Sending VeChain Connex transaction for upvoteAnswer...');
-      const txHash = await vechainConnexService.upvoteAnswer(questionId, answerId);
+      console.log('🚀 Sending REAL VeChain testnet transaction for upvoteAnswer via VeChain SDK...');
       
+      const txHash = await vechainSDKTransactionService.upvoteAnswer(questionId, answerId, account);
       setLastTransactionHash(txHash);
-      console.log('REAL transaction completed:', txHash);
-      alert(`Answer upvoted! REAL transaction hash: ${txHash}`);
+      console.log('✅ REAL VeChain testnet transaction sent:', txHash);
+      alert(`Answer upvoted! Transaction: ${txHash.slice(0, 10)}...`);
       
       // Reload data after transaction
       setTimeout(() => {
         loadPlatformData();
       }, 2000);
       
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to upvote answer:', err);
-      setError(`Failed to upvote answer: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(`Failed to upvote answer: ${err.message || 'Unknown error'}`);
     } finally {
       setIsTransactionPending(false);
     }
@@ -192,21 +216,21 @@ export function QAInterface() {
       setIsTransactionPending(true);
       setError(null);
       
-      console.log('Sending VeChain Connex transaction for approveAnswer...');
-      const txHash = await vechainConnexService.approveAnswer(questionId, answerId);
+      console.log('🚀 Sending REAL VeChain testnet transaction for approveAnswer via VeChain SDK...');
       
+      const txHash = await vechainSDKTransactionService.approveAnswer(questionId, answerId, account);
       setLastTransactionHash(txHash);
-      console.log('REAL transaction completed:', txHash);
-      alert(`Answer approved! REAL transaction hash: ${txHash}`);
+      console.log('✅ REAL VeChain testnet transaction sent:', txHash);
+      alert(`Answer approved! Transaction: ${txHash.slice(0, 10)}...`);
       
       // Reload data after transaction
       setTimeout(() => {
         loadPlatformData();
       }, 2000);
       
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to approve answer:', err);
-      setError(`Failed to approve answer: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      setError(`Failed to approve answer: ${err.message || 'Unknown error'}`);
     } finally {
       setIsTransactionPending(false);
     }
@@ -227,6 +251,16 @@ export function QAInterface() {
 
   return (
     <div className="space-y-8">
+      {/* Private Key Input Modal */}
+      <PrivateKeyInput
+        isVisible={showPrivateKeyInput}
+        onPrivateKeySubmit={handlePrivateKeySubmit}
+        onClose={() => {
+          setShowPrivateKeyInput(false);
+          setPendingTransaction(null);
+        }}
+      />
+      
       {/* Platform Stats */}
       {stats && (
         <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -248,13 +282,6 @@ export function QAInterface() {
         </div>
       )}
 
-      {/* Debug Info */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-        <h3 className="text-lg font-semibold text-yellow-900 mb-2">Debug Info</h3>
-        <div className="text-sm text-yellow-800">
-          <p>VeChain Connex Service Status: {JSON.stringify(vechainConnexService.getServiceStatus())}</p>
-        </div>
-      </div>
 
       {/* Ask Question Form */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -288,10 +315,10 @@ export function QAInterface() {
           </div>
           <button
             onClick={handleAskQuestion}
-            disabled={loading}
+            disabled={isTransactionPending}
             className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Submitting...' : 'Ask Question'}
+            {isTransactionPending ? 'Sending to VeChain Testnet...' : '🚀 Ask Question (Real Blockchain)'}
           </button>
         </div>
       </div>

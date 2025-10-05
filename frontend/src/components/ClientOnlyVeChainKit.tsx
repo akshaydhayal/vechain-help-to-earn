@@ -24,25 +24,20 @@ export function useWallet() {
 }
 
 export function ClientOnlyVeChainKit({ children }: { children: React.ReactNode }) {
-  const [isClient, setIsClient] = useState(false);
   const [account, setAccount] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [isVeWorldAvailable, setIsVeWorldAvailable] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
-    
     // Check if VeWorld is available
-    if (typeof window !== 'undefined') {
-      setIsVeWorldAvailable(!!window.vechain);
-      
-      // Check for existing connection
-      const connected = localStorage.getItem('vechain-wallet-connected');
-      const address = localStorage.getItem('vechain-wallet-address');
-      if (connected === 'true' && address) {
-        setAccount(address);
-        setIsConnected(true);
-      }
+    setIsVeWorldAvailable(!!window.vechain);
+    
+    // Check for existing connection
+    const connected = localStorage.getItem('vechain-wallet-connected');
+    const address = localStorage.getItem('vechain-wallet-address');
+    if (connected === 'true' && address) {
+      setAccount(address);
+      setIsConnected(true);
     }
   }, []);
 
@@ -131,16 +126,7 @@ export function ClientOnlyVeChainKit({ children }: { children: React.ReactNode }
     localStorage.removeItem('vechain-wallet-address');
   };
 
-  if (!isClient) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  // No need for client-side check since we're wrapped with NoSSR
 
   return (
     <WalletContext.Provider value={{
