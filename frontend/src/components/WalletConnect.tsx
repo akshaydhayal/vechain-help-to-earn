@@ -4,7 +4,7 @@ import { useWallet } from './ClientOnlyVeChainKit';
 import { useState, useEffect } from 'react';
 
 export function WalletConnect() {
-  const { account, isConnected, connect, disconnect, isVeWorldAvailable } = useWallet();
+  const { account, isConnected, connect, disconnect } = useWallet();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -33,16 +33,6 @@ export function WalletConnect() {
         >
           Disconnect
         </button>
-      </div>
-    );
-  }
-
-  if (!isVeWorldAvailable) {
-    return (
-      <div className="px-4 py-2 bg-yellow-100 rounded-lg">
-        <span className="text-sm text-yellow-600">
-          VeWorld wallet not detected
-        </span>
       </div>
     );
   }

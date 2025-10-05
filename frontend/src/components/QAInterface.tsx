@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useWallet } from './ClientOnlyVeChainKit';
-import { contractService } from '@/utils/contract';
+import { vechainConnexService } from '@/utils/vechainConnexService';
 
 interface Question {
   id: number;
@@ -39,10 +39,21 @@ export function QAInterface() {
   const [questionBounty, setQuestionBounty] = useState('0.1');
   const [newAnswer, setNewAnswer] = useState('');
   const [selectedQuestionId, setSelectedQuestionId] = useState<number | null>(null);
+  
+  // Transaction states
+  const [isTransactionPending, setIsTransactionPending] = useState(false);
+  const [lastTransactionHash, setLastTransactionHash] = useState<string | null>(null);
 
   useEffect(() => {
     if (isConnected && account) {
-      loadPlatformData();
+      // Initialize the VeChain Connex service when wallet connects
+      vechainConnexService.connectWallet().then(() => {
+        console.log('VeChain Connex service initialized with wallet');
+        loadPlatformData();
+      }).catch((error) => {
+        console.error('Failed to initialize VeChain Connex service:', error);
+        setError('Failed to initialize VeChain Connex service. Please try reconnecting your wallet.');
+      });
     }
   }, [isConnected, account]);
 
@@ -51,9 +62,12 @@ export function QAInterface() {
       setLoading(true);
       setError(null);
       
-      // Load platform stats from real contract
-      const platformStats = await contractService.getPlatformStats();
-      setStats(platformStats);
+      // Load platform stats (mock for now - will be replaced with real contract calls)
+      setStats({
+        totalQuestions: '0',
+        totalAnswers: '0',
+        totalUsers: '0'
+      });
       
       // Load questions from mock data
       const mockQuestions = [
@@ -91,23 +105,28 @@ export function QAInterface() {
     }
 
     try {
-      setLoading(true);
+      setIsTransactionPending(true);
       setError(null);
       
-      const txHash = await contractService.askQuestion(newQuestion, questionBounty);
+      console.log('Sending VeChain Connex transaction for askQuestion...');
+      const txHash = await vechainConnexService.askQuestion(newQuestion, questionBounty);
       
-      alert(`Question submitted! Transaction: ${txHash}`);
+      setLastTransactionHash(txHash);
+      console.log('REAL transaction completed:', txHash);
+      alert(`Question submitted! REAL transaction hash: ${txHash}`);
       setNewQuestion('');
       setQuestionBounty('0.1');
       
-      // Reload data
-      await loadPlatformData();
+      // Reload data after transaction
+      setTimeout(() => {
+        loadPlatformData();
+      }, 2000);
       
     } catch (err) {
       console.error('Failed to ask question:', err);
-      setError('Failed to submit question');
+      setError(`Failed to submit question: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
-      setLoading(false);
+      setIsTransactionPending(false);
     }
   };
 
@@ -118,63 +137,78 @@ export function QAInterface() {
     }
 
     try {
-      setLoading(true);
+      setIsTransactionPending(true);
       setError(null);
       
-      const txHash = await contractService.submitAnswer(questionId, newAnswer);
+      console.log('Sending VeChain Connex transaction for submitAnswer...');
+      const txHash = await vechainConnexService.submitAnswer(questionId, newAnswer);
       
-      alert(`Answer submitted! Transaction: ${txHash}`);
+      setLastTransactionHash(txHash);
+      console.log('REAL transaction completed:', txHash);
+      alert(`Answer submitted! REAL transaction hash: ${txHash}`);
       setNewAnswer('');
       setSelectedQuestionId(null);
       
-      // Reload data
-      await loadPlatformData();
+      // Reload data after transaction
+      setTimeout(() => {
+        loadPlatformData();
+      }, 2000);
       
     } catch (err) {
       console.error('Failed to submit answer:', err);
-      setError('Failed to submit answer');
+      setError(`Failed to submit answer: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
-      setLoading(false);
+      setIsTransactionPending(false);
     }
   };
 
   const handleUpvoteAnswer = async (questionId: number, answerId: number) => {
     try {
-      setLoading(true);
+      setIsTransactionPending(true);
       setError(null);
       
-      const txHash = await contractService.upvoteAnswer(questionId, answerId);
+      console.log('Sending VeChain Connex transaction for upvoteAnswer...');
+      const txHash = await vechainConnexService.upvoteAnswer(questionId, answerId);
       
-      alert(`Answer upvoted! Transaction: ${txHash}`);
+      setLastTransactionHash(txHash);
+      console.log('REAL transaction completed:', txHash);
+      alert(`Answer upvoted! REAL transaction hash: ${txHash}`);
       
-      // Reload data
-      await loadPlatformData();
+      // Reload data after transaction
+      setTimeout(() => {
+        loadPlatformData();
+      }, 2000);
       
     } catch (err) {
       console.error('Failed to upvote answer:', err);
-      setError('Failed to upvote answer');
+      setError(`Failed to upvote answer: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
-      setLoading(false);
+      setIsTransactionPending(false);
     }
   };
 
   const handleApproveAnswer = async (questionId: number, answerId: number) => {
     try {
-      setLoading(true);
+      setIsTransactionPending(true);
       setError(null);
       
-      const txHash = await contractService.approveAnswer(questionId, answerId);
+      console.log('Sending VeChain Connex transaction for approveAnswer...');
+      const txHash = await vechainConnexService.approveAnswer(questionId, answerId);
       
-      alert(`Answer approved! Transaction: ${txHash}`);
+      setLastTransactionHash(txHash);
+      console.log('REAL transaction completed:', txHash);
+      alert(`Answer approved! REAL transaction hash: ${txHash}`);
       
-      // Reload data
-      await loadPlatformData();
+      // Reload data after transaction
+      setTimeout(() => {
+        loadPlatformData();
+      }, 2000);
       
     } catch (err) {
       console.error('Failed to approve answer:', err);
-      setError('Failed to approve answer');
+      setError(`Failed to approve answer: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
-      setLoading(false);
+      setIsTransactionPending(false);
     }
   };
 
@@ -213,6 +247,14 @@ export function QAInterface() {
           </div>
         </div>
       )}
+
+      {/* Debug Info */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <h3 className="text-lg font-semibold text-yellow-900 mb-2">Debug Info</h3>
+        <div className="text-sm text-yellow-800">
+          <p>VeChain Connex Service Status: {JSON.stringify(vechainConnexService.getServiceStatus())}</p>
+        </div>
+      </div>
 
       {/* Ask Question Form */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -309,7 +351,26 @@ export function QAInterface() {
       {loading && (
         <div className="text-center py-4">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Processing transaction...</p>
+          <p className="mt-2 text-gray-600">Loading...</p>
+        </div>
+      )}
+
+      {/* Transaction Status */}
+      {isTransactionPending && (
+        <div className="text-center py-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Processing REAL blockchain transaction...</p>
+        </div>
+      )}
+
+      {/* Last Transaction Hash */}
+      {lastTransactionHash && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="text-green-800">
+            <strong>REAL Transaction Confirmed!</strong>
+            <br />
+            <span className="text-sm font-mono">Hash: {lastTransactionHash}</span>
+          </div>
         </div>
       )}
     </div>

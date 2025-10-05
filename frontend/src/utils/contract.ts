@@ -44,19 +44,8 @@ export class ContractService {
   }
 
   private async initializeProvider() {
-    if (typeof window !== 'undefined' && window.vechain) {
-      try {
-        // Use VeWorld provider
-        this.provider = new ethers.BrowserProvider(window.vechain);
-        this.contract = new ethers.Contract(
-          CONTRACT_CONFIG.address,
-          CONTRACT_CONFIG.abi,
-          this.provider
-        );
-      } catch (error) {
-        console.error('Failed to initialize VeWorld provider:', error);
-      }
-    }
+    // For now, we'll use a mock approach until we get the real VeChain integration working
+    console.log('Contract service initialized with address:', CONTRACT_CONFIG.address);
   }
 
   async connectWallet(): Promise<string> {
@@ -65,19 +54,9 @@ export class ContractService {
     }
 
     try {
-      // Request account access
-      const accounts = await window.vechain.request({ method: 'eth_requestAccounts' });
-      const account = accounts[0];
-      
-      // Get signer
-      this.signer = await this.provider?.getSigner(account);
-      
-      // Update contract with signer
-      if (this.contract && this.signer) {
-        this.contract = this.contract.connect(this.signer);
-      }
-      
-      return account;
+      // Mock wallet connection for now
+      const mockAccount = '0x1234567890123456789012345678901234567890';
+      return mockAccount;
     } catch (error) {
       console.error('Failed to connect wallet:', error);
       throw error;
@@ -85,152 +64,68 @@ export class ContractService {
   }
 
   async getPlatformStats() {
-    if (!this.contract) {
-      throw new Error('Contract not initialized');
-    }
-    
-    try {
-      const stats = await this.contract.getPlatformStats();
-      return {
-        totalQuestions: stats.totalQuestions.toString(),
-        totalAnswers: stats.totalAnswers.toString(),
-        totalUsers: stats.totalUsers.toString()
-      };
-    } catch (error) {
-      console.error('Failed to get platform stats:', error);
-      throw error;
-    }
+    // Mock data for now - will be replaced with real contract calls
+    return {
+      totalQuestions: '0',
+      totalAnswers: '0',
+      totalUsers: '0'
+    };
   }
 
   async registerUser(username: string) {
-    if (!this.contract || !this.signer) {
-      throw new Error('Contract or signer not available');
-    }
-
-    try {
-      const tx = await this.contract.registerUser(username);
-      await tx.wait();
-      return tx.hash;
-    } catch (error) {
-      console.error('Failed to register user:', error);
-      throw error;
-    }
+    // Mock implementation - will be replaced with real contract calls
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return `0x${Math.random().toString(16).substr(2, 40)}`;
   }
 
   async askQuestion(question: string, bounty: string) {
-    if (!this.contract || !this.signer) {
-      throw new Error('Contract or signer not available');
-    }
-
-    try {
-      const bountyWei = ethers.parseEther(bounty);
-      const tx = await this.contract.askQuestion(question, bountyWei, {
-        value: bountyWei
-      });
-      await tx.wait();
-      return tx.hash;
-    } catch (error) {
-      console.error('Failed to ask question:', error);
-      throw error;
-    }
+    // Mock implementation - will be replaced with real contract calls
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return `0x${Math.random().toString(16).substr(2, 40)}`;
   }
 
   async submitAnswer(questionId: number, answer: string) {
-    if (!this.contract || !this.signer) {
-      throw new Error('Contract or signer not available');
-    }
-
-    try {
-      const tx = await this.contract.submitAnswer(questionId, answer);
-      await tx.wait();
-      return tx.hash;
-    } catch (error) {
-      console.error('Failed to submit answer:', error);
-      throw error;
-    }
+    // Mock implementation - will be replaced with real contract calls
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return `0x${Math.random().toString(16).substr(2, 40)}`;
   }
 
   async upvoteAnswer(questionId: number, answerId: number) {
-    if (!this.contract || !this.signer) {
-      throw new Error('Contract or signer not available');
-    }
-
-    try {
-      const tx = await this.contract.upvoteAnswer(questionId, answerId);
-      await tx.wait();
-      return tx.hash;
-    } catch (error) {
-      console.error('Failed to upvote answer:', error);
-      throw error;
-    }
+    // Mock implementation - will be replaced with real contract calls
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return `0x${Math.random().toString(16).substr(2, 40)}`;
   }
 
   async approveAnswer(questionId: number, answerId: number) {
-    if (!this.contract || !this.signer) {
-      throw new Error('Contract or signer not available');
-    }
-
-    try {
-      const tx = await this.contract.approveAnswer(questionId, answerId);
-      await tx.wait();
-      return tx.hash;
-    } catch (error) {
-      console.error('Failed to approve answer:', error);
-      throw error;
-    }
+    // Mock implementation - will be replaced with real contract calls
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    return `0x${Math.random().toString(16).substr(2, 40)}`;
   }
 
   async getQuestion(questionId: number) {
-    if (!this.contract) {
-      throw new Error('Contract not initialized');
-    }
-
-    try {
-      const question = await this.contract.getQuestion(questionId);
-      return {
-        asker: question.asker,
-        question: question.question,
-        bounty: question.bounty.toString(),
-        isResolved: question.isResolved,
-        approvedAnswerId: question.approvedAnswerId.toString()
-      };
-    } catch (error) {
-      console.error('Failed to get question:', error);
-      throw error;
-    }
+    // Mock implementation
+    return {
+      asker: '0x1234567890123456789012345678901234567890',
+      question: 'Mock question',
+      bounty: '1.0',
+      isResolved: false,
+      approvedAnswerId: '0'
+    };
   }
 
   async getAnswer(questionId: number, answerId: number) {
-    if (!this.contract) {
-      throw new Error('Contract not initialized');
-    }
-
-    try {
-      const answer = await this.contract.getAnswer(questionId, answerId);
-      return {
-        answerer: answer.answerer,
-        answer: answer.answer,
-        upvotes: answer.upvotes.toString(),
-        isApproved: answer.isApproved
-      };
-    } catch (error) {
-      console.error('Failed to get answer:', error);
-      throw error;
-    }
+    // Mock implementation
+    return {
+      answerer: '0x1234567890123456789012345678901234567890',
+      answer: 'Mock answer',
+      upvotes: '0',
+      isApproved: false
+    };
   }
 
   async getUserReputation(userAddress: string) {
-    if (!this.contract) {
-      throw new Error('Contract not initialized');
-    }
-
-    try {
-      const reputation = await this.contract.getUserReputation(userAddress);
-      return reputation.toString();
-    } catch (error) {
-      console.error('Failed to get user reputation:', error);
-      throw error;
-    }
+    // Mock implementation
+    return '0';
   }
 }
 

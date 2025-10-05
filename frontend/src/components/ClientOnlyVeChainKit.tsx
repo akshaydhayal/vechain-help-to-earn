@@ -93,7 +93,8 @@ export function ClientOnlyVeChainKit({ children }: { children: React.ReactNode }
       console.log('Connection result:', result);
       
       // Handle different response formats
-      if (result && result.account) {
+      if (result && typeof result === 'object' && 'account' in result) {
+        // Handle object response with account property
         setAccount(result.account);
         setIsConnected(true);
         localStorage.setItem('vechain-wallet-connected', 'true');
@@ -115,8 +116,9 @@ export function ClientOnlyVeChainKit({ children }: { children: React.ReactNode }
       }
     } catch (error) {
       console.error('Failed to connect to VeWorld:', error);
-      console.error('Error details:', error.message);
-      alert(`Failed to connect to VeWorld wallet: ${error.message}. Please try again.`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('Error details:', errorMessage);
+      alert(`Failed to connect to VeWorld wallet: ${errorMessage}. Please try again.`);
     }
   };
 
