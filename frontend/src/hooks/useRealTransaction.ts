@@ -1,6 +1,7 @@
 // Real blockchain transaction hook using VeChain Kit
 import { useSendTransaction, useWallet, useThor } from '@vechain/vechain-kit';
 import { useMemo, useCallback } from 'react';
+import { ethers } from 'ethers';
 
 // Contract ABI for SimpleQA
 const SIMPLE_QA_ABI = [
@@ -37,10 +38,10 @@ export function useRealTransaction() {
     if (!account?.address || !thor) return [];
     
     try {
-      const bountyWei = thor.utils.parseEther(bounty);
+      const bountyWei = ethers.parseEther(bounty);
       
       // Encode the function call
-      const iface = new thor.utils.Interface(SIMPLE_QA_ABI);
+      const iface = new ethers.Interface(SIMPLE_QA_ABI);
       const data = iface.encodeFunctionData('askQuestion', [question, bountyWei]);
       
       return [{
@@ -60,7 +61,7 @@ export function useRealTransaction() {
     if (!account?.address || !thor) return [];
     
     try {
-      const iface = new thor.utils.Interface(SIMPLE_QA_ABI);
+      const iface = new ethers.Interface(SIMPLE_QA_ABI);
       const data = iface.encodeFunctionData('submitAnswer', [questionId, answer]);
       
       return [{
@@ -80,7 +81,7 @@ export function useRealTransaction() {
     if (!account?.address || !thor) return [];
     
     try {
-      const iface = new thor.utils.Interface(SIMPLE_QA_ABI);
+      const iface = new ethers.Interface(SIMPLE_QA_ABI);
       const data = iface.encodeFunctionData('upvoteAnswer', [questionId, answerId]);
       
       return [{
@@ -100,7 +101,7 @@ export function useRealTransaction() {
     if (!account?.address || !thor) return [];
     
     try {
-      const iface = new thor.utils.Interface(SIMPLE_QA_ABI);
+      const iface = new ethers.Interface(SIMPLE_QA_ABI);
       const data = iface.encodeFunctionData('approveAnswer', [questionId, answerId]);
       
       return [{

@@ -42,7 +42,7 @@ export function PrivateKeyInput({ onPrivateKeySubmit, isVisible, onClose }: Priv
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
           <div className="text-sm text-yellow-800">
             <strong>⚠️ Security Notice:</strong> Your private key is only used locally to sign transactions. 
-            It's never stored or sent to any server. Make sure you're using a testnet account.
+            It&apos;s never stored or sent to any server. Make sure you&apos;re using a testnet account.
           </div>
         </div>
 

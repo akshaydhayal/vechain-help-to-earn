@@ -54,14 +54,14 @@ export function ClientOnlyVeChainKit({ children }: { children: React.ReactNode }
       let result;
       
       // Method 1: Try direct connect (most common)
-      if (window.vechain.connect) {
+      if ('connect' in window.vechain && typeof window.vechain.connect === 'function') {
         console.log('Trying direct connect method...');
-        result = await window.vechain.connect();
+        result = await (window.vechain as { connect: () => Promise<{ account: string; verified: boolean }> }).connect();
       }
       // Method 2: Try request method (EIP-1193 standard)
-      else if (window.vechain.request) {
+      else if ('request' in window.vechain && typeof window.vechain.request === 'function') {
         console.log('Trying request method...');
-        result = await window.vechain.request({ method: 'eth_requestAccounts' });
+        result = await (window.vechain as { request: (params: { method: string; params?: unknown[] }) => Promise<string[]> }).request({ method: 'eth_requestAccounts' });
       }
       // Method 3: Try newConnexSigner without connect method
       else if (window.vechain.newConnexSigner) {
@@ -71,12 +71,12 @@ export function ClientOnlyVeChainKit({ children }: { children: React.ReactNode }
         console.log('Signer methods:', Object.keys(signer));
         
         // Try different signer methods
-        if (signer.request) {
-          result = await signer.request({ method: 'eth_requestAccounts' });
-        } else if (signer.connect) {
-          result = await signer.connect();
-        } else if (signer.getAccount) {
-          result = await signer.getAccount();
+        if ('request' in signer && typeof signer.request === 'function') {
+          result = await (signer as { request: (params: { method: string; params?: unknown[] }) => Promise<string[]> }).request({ method: 'eth_requestAccounts' });
+        } else if ('connect' in signer && typeof signer.connect === 'function') {
+          result = await (signer as { connect: () => Promise<{ account: string; verified: boolean }> }).connect();
+        } else if ('getAccount' in signer && typeof signer.getAccount === 'function') {
+          result = await (signer as { getAccount: () => Promise<string> }).getAccount();
         } else {
           throw new Error('newConnexSigner returned object without expected methods');
         }

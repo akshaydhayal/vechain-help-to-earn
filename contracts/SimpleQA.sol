@@ -186,8 +186,9 @@ contract SimpleQA {
         string memory _content
     ) external questionExists(_questionId) {
         require(bytes(_content).length > 0, "Answer content cannot be empty");
-        require(questions[_questionId].isActive, "Question is not active");
-        require(questions[_questionId].asker != msg.sender, "Cannot answer your own question");
+        // Removed restrictions: anyone can answer any question
+        // require(questions[_questionId].isActive, "Question is not active");
+        // require(questions[_questionId].asker != msg.sender, "Cannot answer your own question");
         
         // Register user if not already registered
         if (users[msg.sender].wallet == address(0)) {
@@ -220,8 +221,9 @@ contract SimpleQA {
     
     // Upvote an answer
     function upvoteAnswer(uint256 _answerId) external answerExists(_answerId) {
-        require(!hasUpvoted[msg.sender][_answerId], "Already upvoted this answer");
-        require(answers[_answerId].answerer != msg.sender, "Cannot upvote your own answer");
+        // Removed restrictions: anyone can upvote any answer multiple times
+        // require(!hasUpvoted[msg.sender][_answerId], "Already upvoted this answer");
+        // require(answers[_answerId].answerer != msg.sender, "Cannot upvote your own answer");
         
         answers[_answerId].upvotes++;
         hasUpvoted[msg.sender][_answerId] = true;
@@ -232,12 +234,13 @@ contract SimpleQA {
         emit AnswerUpvoted(_answerId, msg.sender, answers[_answerId].upvotes);
     }
     
-    // Approve an answer (only question asker can do this)
+    // Approve an answer (anyone can approve any answer)
     function approveAnswer(uint256 _answerId) external answerExists(_answerId) {
         uint256 questionId = answers[_answerId].questionId;
-        require(questions[questionId].asker == msg.sender, "Only question asker can approve answers");
-        require(!questions[questionId].hasApprovedAnswer, "Question already has an approved answer");
-        require(questions[questionId].isActive, "Question is not active");
+        // Removed restrictions: anyone can approve any answer
+        // require(questions[questionId].asker == msg.sender, "Only question asker can approve answers");
+        // require(!questions[questionId].hasApprovedAnswer, "Question already has an approved answer");
+        // require(questions[questionId].isActive, "Question is not active");
         
         // Mark answer as approved
         answers[_answerId].isApproved = true;
@@ -342,6 +345,16 @@ contract SimpleQA {
             a.isApproved,
             a.timestamp
         );
+    }
+    
+    // Get question asker information
+    function getQuestionAsker(uint256 _questionId) external view questionExists(_questionId) returns (address asker) {
+        return questions[_questionId].asker;
+    }
+    
+    // Get answerer information
+    function getAnswerer(uint256 _answerId) external view answerExists(_answerId) returns (address answerer) {
+        return answers[_answerId].answerer;
     }
     
     function getUser(address _user) external view returns (

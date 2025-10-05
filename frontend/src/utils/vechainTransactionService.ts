@@ -51,7 +51,7 @@ export class VeChainTransactionService {
   }
 
   // Helper function to encode function calls
-  private encodeFunctionCall(functionName: string, params: any[]): string {
+  private encodeFunctionCall(functionName: string, params: unknown[]): string {
     // This is a simplified ABI encoder - in production, use a proper ABI encoder
     // For now, we'll use a basic approach
     const functionSignatures: { [key: string]: string } = {

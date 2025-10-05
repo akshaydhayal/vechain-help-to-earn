@@ -110,7 +110,7 @@ export default function Home() {
                 <div>
                   <span className="font-medium">Contract Address:</span>
                   <span className="ml-2 font-mono bg-gray-100 px-2 py-1 rounded">
-                    0xed10481bacc6f37bd837715e8972e8b2234f7628
+                    0x25d137e1d0bf7f135706803cd7722946e483aecf
                   </span>
                         </div>
                 <div>
@@ -120,7 +120,7 @@ export default function Home() {
                 <div>
                   <span className="font-medium">Explorer:</span>
                   <a 
-                    href="https://explore-testnet.vechain.org/transactions/0xed10481bacc6f37bd837715e8972e8b2234f7628"
+                    href="https://explore-testnet.vechain.org/transactions/0x25d137e1d0bf7f135706803cd7722946e483aecf"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="ml-2 text-blue-600 hover:underline"
