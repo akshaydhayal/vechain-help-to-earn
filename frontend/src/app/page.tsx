@@ -88,48 +88,6 @@ export default function Home() {
                 {/* Q&A Interface */}
                 <QAInterface />
 
-            {/* Next Steps */}
-            <div className="bg-blue-50 rounded-lg border border-blue-200 p-6">
-              <h3 className="text-lg font-semibold text-blue-900 mb-2">
-                🚀 Next Steps
-              </h3>
-              <ul className="space-y-2 text-blue-800">
-                <li>• Connect to our deployed SimpleQA contract</li>
-                <li>• Ask questions with VET bounties</li>
-                <li>• Submit answers and earn rewards</li>
-                <li>• Build your reputation on VeChain</li>
-              </ul>
-                  </div>
-                  
-            {/* Contract Info */}
-            <div className="bg-gray-50 rounded-lg border p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                📋 Contract Information
-              </h3>
-              <div className="space-y-2 text-sm">
-                <div>
-                  <span className="font-medium">Contract Address:</span>
-                  <span className="ml-2 font-mono bg-gray-100 px-2 py-1 rounded">
-                    0x25d137e1d0bf7f135706803cd7722946e483aecf
-                  </span>
-                        </div>
-                <div>
-                  <span className="font-medium">Network:</span>
-                  <span className="ml-2">VeChain Testnet</span>
-                        </div>
-                <div>
-                  <span className="font-medium">Explorer:</span>
-                  <a 
-                    href="https://explore-testnet.vechain.org/transactions/0x25d137e1d0bf7f135706803cd7722946e483aecf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="ml-2 text-blue-600 hover:underline"
-                  >
-                    View on VeChain Explorer
-                  </a>
-                    </div>
-                  </div>
-            </div>
           </div>
         )}
       </main>

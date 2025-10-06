@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useWallet } from './ClientOnlyVeChainKit';
 import { vechainSDKTransactionService } from '@/utils/simpleTransactionService';
-import { contractDataService } from '@/utils/contractDataService';
-import { QuestionCard } from './QuestionCard';
-import { TransactionHistory } from './TransactionHistory';
+import { vechainContractService } from '@/utils/vechainContractService';
+import { QuestionList } from './QuestionList';
+import { QuestionDetail } from './QuestionDetail';
+import { useToaster } from './ToasterNotification';
 
 interface Question {
   id: number;
@@ -53,6 +54,13 @@ export function QAInterface() {
   // Transaction states
   const [isTransactionPending, setIsTransactionPending] = useState(false);
   const [lastTransactionHash, setLastTransactionHash] = useState<string | null>(null);
+  
+  // View state
+  const [currentView, setCurrentView] = useState<'list' | 'detail'>('list');
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
+  
+  // Toaster notifications
+  const { notifications, showTransactionSuccess, showTransactionError, removeNotification } = useToaster();
 
   useEffect(() => {
     if (isConnected && account) {
@@ -66,25 +74,25 @@ export function QAInterface() {
       setLoading(true);
       setError(null);
       
-      console.log('Loading platform data from contract...');
+      console.log('Loading platform data from VeChain contract...');
       
       // Load platform stats from contract
-      const platformStats = await contractDataService.getPlatformStats();
+      const platformStats = await vechainContractService.getPlatformStats();
       setStats(platformStats);
       
       // Load questions from contract
-      const contractQuestions = await contractDataService.getAllQuestions();
+      const contractQuestions = await vechainContractService.getAllQuestions();
       setQuestions(contractQuestions);
       
       // Load answers for each question
       const answersData: { [questionId: number]: Answer[] } = {};
       for (const question of contractQuestions) {
-        const questionAnswers = await contractDataService.getQuestionAnswers(question.id);
+        const questionAnswers = await vechainContractService.getQuestionAnswers(question.id);
         answersData[question.id] = questionAnswers;
       }
       setAnswers(answersData);
       
-      console.log('Platform data loaded:', {
+      console.log('Platform data loaded from contract:', {
         stats: platformStats,
         questions: contractQuestions,
         answers: answersData
@@ -96,6 +104,19 @@ export function QAInterface() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleQuestionClick = (questionId: number) => {
+    const question = questions.find(q => q.id === questionId);
+    if (question) {
+      setSelectedQuestion(question);
+      setCurrentView('detail');
+    }
+  };
+
+  const handleBackToList = () => {
+    setCurrentView('list');
+    setSelectedQuestion(null);
   };
 
   const handleAskQuestion = async () => {
@@ -123,7 +144,7 @@ export function QAInterface() {
       
       setLastTransactionHash(txHash);
       console.log('✅ REAL VeChain testnet transaction sent:', txHash);
-      alert(`✅ Question submitted to VeChain testnet! Transaction: ${txHash.slice(0, 10)}...`);
+      showTransactionSuccess(txHash);
       
       // Clear form
       setQuestionTitle('');
@@ -158,7 +179,7 @@ export function QAInterface() {
           const txHash = await vechainSDKTransactionService.submitAnswer(questionId, answer, account || undefined);
       setLastTransactionHash(txHash);
       console.log('✅ REAL VeChain testnet transaction sent:', txHash);
-      alert(`Answer submitted to VeChain testnet! Transaction: ${txHash.slice(0, 10)}...`);
+      showTransactionSuccess(txHash);
       
       // Reload data after transaction
       setTimeout(() => {
@@ -183,7 +204,7 @@ export function QAInterface() {
           const txHash = await vechainSDKTransactionService.upvoteAnswer(questionId, answerId, account || undefined);
       setLastTransactionHash(txHash);
       console.log('✅ REAL VeChain testnet transaction sent:', txHash);
-      alert(`Answer upvoted! Transaction: ${txHash.slice(0, 10)}...`);
+      showTransactionSuccess(txHash);
       
       // Reload data after transaction
       setTimeout(() => {
@@ -208,7 +229,7 @@ export function QAInterface() {
           const txHash = await vechainSDKTransactionService.approveAnswer(questionId, answerId, account || undefined);
           setLastTransactionHash(txHash);
           console.log('✅ REAL VeChain testnet transaction sent:', txHash);
-          alert(`Answer approved! Transaction: ${txHash.slice(0, 10)}...`);
+          showTransactionSuccess(txHash);
           
           // Reload data after transaction
           setTimeout(() => {
@@ -318,37 +339,26 @@ export function QAInterface() {
           <span className="mr-3">❓</span>
           Community Questions
         </h2>
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading questions from contract...</p>
-          </div>
-        ) : questions.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">🤔</div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">No questions yet</h3>
-            <p className="text-gray-500">Be the first to ask a question and start the conversation!</p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {questions.map((question) => (
-              <QuestionCard
-                key={question.id}
-                question={question}
-                answers={answers[question.id] || []}
-                onAnswerSubmit={handleSubmitAnswer}
-                onUpvote={handleUpvoteAnswer}
-                onApprove={handleApproveAnswer}
-                isTransactionPending={isTransactionPending}
-                currentUser={account || ''}
-              />
-            ))}
-          </div>
-        )}
+        {currentView === 'list' ? (
+          <QuestionList
+            questions={questions}
+            onQuestionClick={handleQuestionClick}
+            loading={loading}
+          />
+        ) : selectedQuestion ? (
+          <QuestionDetail
+            question={selectedQuestion}
+            answers={answers[selectedQuestion.id] || []}
+            onAnswerSubmit={handleSubmitAnswer}
+            onUpvote={handleUpvoteAnswer}
+            onApprove={handleApproveAnswer}
+            onBack={handleBackToList}
+            isTransactionPending={isTransactionPending}
+            currentUser={account || ''}
+          />
+        ) : null}
       </div>
 
-      {/* Transaction History */}
-      <TransactionHistory />
 
       {/* Error Display */}
       {error && (
@@ -365,24 +375,29 @@ export function QAInterface() {
         </div>
       )}
 
-      {/* Transaction Status */}
-      {isTransactionPending && (
-        <div className="text-center py-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Processing REAL blockchain transaction...</p>
-        </div>
-      )}
 
-      {/* Last Transaction Hash */}
-      {lastTransactionHash && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <div className="text-green-800">
-            <strong>REAL Transaction Confirmed!</strong>
-            <br />
-            <span className="text-sm font-mono">Hash: {lastTransactionHash}</span>
+      {/* Toaster Notifications */}
+      {notifications.map((notification) => (
+        <div key={notification.id} className="fixed top-4 right-4 z-50">
+          <div className="bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg max-w-md transform transition-all duration-300 translate-x-0 opacity-100">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <span className="text-lg">✅</span>
+                <div>
+                  <p className="font-semibold text-sm">{notification.message}</p>
+                  <p className="text-xs opacity-90 mt-1">Transaction confirmed on VeChain</p>
+                </div>
+              </div>
+              <button
+                onClick={() => removeNotification(notification.id)}
+                className="ml-4 text-white hover:text-gray-200 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
           </div>
         </div>
-      )}
+      ))}
     </div>
   );
 }
