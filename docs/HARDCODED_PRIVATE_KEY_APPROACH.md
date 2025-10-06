@@ -9,13 +9,13 @@ The VeWorld wallet automatic signing was failing, so I've reverted to the workin
 ### 1. **Hardcoded Private Key for Transaction Signing**
 ```typescript
 // Use hardcoded private key for transaction signing
-const hardcodedPrivateKey = '9dd489bda0d66bcba0d8e36057cb3a570e6197ab5a88e56b495f5cba71e83922';
+const privateKey = process.env.PRIVATE_KEY;
 
 try {
   console.log('🔐 Signing transaction with hardcoded private key...');
   
   // Convert private key to bytes
-  const privateKeyBytes = HexUInt.of(hardcodedPrivateKey).bytes;
+        const privateKeyBytes = HexUInt.of(privateKey).bytes;
   
   // Create and sign transaction
   const transaction = Transaction.of(txBody);

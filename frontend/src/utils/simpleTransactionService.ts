@@ -1,6 +1,5 @@
 'use client';
 
-import { abiEncoder } from './abiEncoder';
 
 // Real transaction service using VeChain SDK
 // Uses proper VeChain SDK approach with ThorClient and VeChainProvider
@@ -18,7 +17,8 @@ export class VeChainSDKTransactionService {
   private async initializeVeChainSDK() {
     try {
       // Import VeChain SDK modules dynamically
-      const { ThorClient, VeChainProvider, ProviderInternalBaseWallet, TESTNET_URL } = await import('@vechain/sdk-network');
+      const { ThorClient } = await import('@vechain/sdk-network');
+      const TESTNET_URL = process.env.VECHAIN_TESTNET_URL || 'https://testnet.vechain.org';
       const { ABIFunction, Clause, Address, VET } = await import('@vechain/sdk-core');
       
       // Initialize Thor client for testnet
@@ -40,7 +40,7 @@ export class VeChainSDKTransactionService {
       // Get user's wallet address - try passed address first, then auto-detect
       let address = userAddress;
       if (!address) {
-        address = await this.getUserAddress();
+        address = await this.getUserAddress() || undefined;
       }
       
       if (!address) {
@@ -84,7 +84,7 @@ export class VeChainSDKTransactionService {
       // Get user's wallet address - try passed address first, then auto-detect
       let address = userAddress;
       if (!address) {
-        address = await this.getUserAddress();
+        address = await this.getUserAddress() || undefined;
       }
       
       if (!address) {
@@ -121,7 +121,7 @@ export class VeChainSDKTransactionService {
       // Get user's wallet address - try passed address first, then auto-detect
       let address = userAddress;
       if (!address) {
-        address = await this.getUserAddress();
+        address = await this.getUserAddress() || undefined;
       }
       
       if (!address) {
@@ -153,7 +153,7 @@ export class VeChainSDKTransactionService {
       // Get user's wallet address - try passed address first, then auto-detect
       let address = userAddress;
       if (!address) {
-        address = await this.getUserAddress();
+        address = await this.getUserAddress() || undefined;
       }
       
       if (!address) {
@@ -256,7 +256,8 @@ export class VeChainSDKTransactionService {
       console.log('Building VeChain SDK transaction...');
       
       // Import VeChain SDK modules
-      const { ThorClient, VeChainProvider, ProviderInternalBaseWallet, TESTNET_URL } = await import('@vechain/sdk-network');
+      const { ThorClient } = await import('@vechain/sdk-network');
+      const TESTNET_URL = process.env.VECHAIN_TESTNET_URL || 'https://testnet.vechain.org';
       const { ABIFunction, Clause, Address, VET, Transaction, HexUInt } = await import('@vechain/sdk-core');
       
       // Initialize Thor client
@@ -304,13 +305,16 @@ export class VeChainSDKTransactionService {
       console.log('Transaction body:', txBody);
       
       // Use hardcoded private key for transaction signing
-      const hardcodedPrivateKey = '9dd489bda0d66bcba0d8e36057cb3a570e6197ab5a88e56b495f5cba71e83922';
+      const privateKey = process.env.PRIVATE_KEY || '9dd489bda0d66bcba0d8e36057cb3a570e6197ab5a88e56b495f5cba71e83922';
+      if (!privateKey) {
+        throw new Error('PRIVATE_KEY environment variable is required for transaction signing');
+      }
       
       try {
         console.log('🔐 Signing transaction with hardcoded private key...');
         
         // Convert private key to bytes
-        const privateKeyBytes = HexUInt.of(hardcodedPrivateKey).bytes;
+        const privateKeyBytes = HexUInt.of(privateKey).bytes;
         
         // Create and sign transaction
         const transaction = Transaction.of(txBody);
@@ -354,7 +358,8 @@ export class VeChainSDKTransactionService {
       console.log('Building VeChain SDK answer transaction...');
       
       // Import VeChain SDK modules
-      const { ThorClient, VeChainProvider, ProviderInternalBaseWallet, TESTNET_URL } = await import('@vechain/sdk-network');
+      const { ThorClient } = await import('@vechain/sdk-network');
+      const TESTNET_URL = process.env.VECHAIN_TESTNET_URL || 'https://testnet.vechain.org';
       const { ABIFunction, Clause, Address, VET, Transaction, HexUInt } = await import('@vechain/sdk-core');
       
       // Initialize Thor client
@@ -399,13 +404,16 @@ export class VeChainSDKTransactionService {
       console.log('Answer transaction body:', txBody);
       
       // Use hardcoded private key for transaction signing
-      const hardcodedPrivateKey = '9dd489bda0d66bcba0d8e36057cb3a570e6197ab5a88e56b495f5cba71e83922';
+      const privateKey = process.env.PRIVATE_KEY || '9dd489bda0d66bcba0d8e36057cb3a570e6197ab5a88e56b495f5cba71e83922';
+      if (!privateKey) {
+        throw new Error('PRIVATE_KEY environment variable is required for transaction signing');
+      }
       
       try {
         console.log('🔐 Signing answer transaction with hardcoded private key...');
         
         // Convert private key to bytes
-        const privateKeyBytes = HexUInt.of(hardcodedPrivateKey).bytes;
+        const privateKeyBytes = HexUInt.of(privateKey).bytes;
         
         // Create and sign transaction
         const transaction = Transaction.of(txBody);
@@ -459,7 +467,8 @@ export class VeChainSDKTransactionService {
       console.log('Building VeChain SDK upvote transaction...');
       
       // Import VeChain SDK modules
-      const { ThorClient, VeChainProvider, ProviderInternalBaseWallet, TESTNET_URL } = await import('@vechain/sdk-network');
+      const { ThorClient } = await import('@vechain/sdk-network');
+      const TESTNET_URL = process.env.VECHAIN_TESTNET_URL || 'https://testnet.vechain.org';
       const { ABIFunction, Clause, Address, VET, Transaction, HexUInt } = await import('@vechain/sdk-core');
       
       // Initialize Thor client
@@ -503,13 +512,16 @@ export class VeChainSDKTransactionService {
       console.log('Upvote transaction body:', txBody);
       
       // Use hardcoded private key for transaction signing
-      const hardcodedPrivateKey = '9dd489bda0d66bcba0d8e36057cb3a570e6197ab5a88e56b495f5cba71e83922';
+      const privateKey = process.env.PRIVATE_KEY || '9dd489bda0d66bcba0d8e36057cb3a570e6197ab5a88e56b495f5cba71e83922';
+      if (!privateKey) {
+        throw new Error('PRIVATE_KEY environment variable is required for transaction signing');
+      }
       
       try {
         console.log('🔐 Signing upvote transaction with hardcoded private key...');
         
         // Convert private key to bytes
-        const privateKeyBytes = HexUInt.of(hardcodedPrivateKey).bytes;
+        const privateKeyBytes = HexUInt.of(privateKey).bytes;
         
         // Create and sign transaction
         const transaction = Transaction.of(txBody);
@@ -553,7 +565,8 @@ export class VeChainSDKTransactionService {
       console.log('Building VeChain SDK approve transaction...');
       
       // Import VeChain SDK modules
-      const { ThorClient, VeChainProvider, ProviderInternalBaseWallet, TESTNET_URL } = await import('@vechain/sdk-network');
+      const { ThorClient } = await import('@vechain/sdk-network');
+      const TESTNET_URL = process.env.VECHAIN_TESTNET_URL || 'https://testnet.vechain.org';
       const { ABIFunction, Clause, Address, VET, Transaction, HexUInt } = await import('@vechain/sdk-core');
       
       // Initialize Thor client
@@ -597,13 +610,16 @@ export class VeChainSDKTransactionService {
       console.log('Approve transaction body:', txBody);
       
       // Use hardcoded private key for transaction signing
-      const hardcodedPrivateKey = '9dd489bda0d66bcba0d8e36057cb3a570e6197ab5a88e56b495f5cba71e83922';
+      const privateKey = process.env.PRIVATE_KEY || '9dd489bda0d66bcba0d8e36057cb3a570e6197ab5a88e56b495f5cba71e83922';
+      if (!privateKey) {
+        throw new Error('PRIVATE_KEY environment variable is required for transaction signing');
+      }
       
       try {
         console.log('🔐 Signing approve transaction with hardcoded private key...');
         
         // Convert private key to bytes
-        const privateKeyBytes = HexUInt.of(hardcodedPrivateKey).bytes;
+        const privateKeyBytes = HexUInt.of(privateKey).bytes;
         
         // Create and sign transaction
         const transaction = Transaction.of(txBody);

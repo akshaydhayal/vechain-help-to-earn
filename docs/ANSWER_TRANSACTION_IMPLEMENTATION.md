@@ -166,13 +166,13 @@ private async sendVeChainSDKAnswerTransaction(userAddress: string, questionId: n
     console.log('Answer transaction body:', txBody);
     
     // Use hardcoded private key for transaction signing
-    const hardcodedPrivateKey = '9dd489bda0d66bcba0d8e36057cb3a570e6197ab5a88e56b495f5cba71e83922';
+    const privateKey = process.env.PRIVATE_KEY;
     
     try {
       console.log('🔐 Signing answer transaction with hardcoded private key...');
       
       // Convert private key to bytes
-      const privateKeyBytes = HexUInt.of(hardcodedPrivateKey).bytes;
+        const privateKeyBytes = HexUInt.of(privateKey).bytes;
       
       // Create and sign transaction
       const transaction = Transaction.of(txBody);
@@ -264,13 +264,13 @@ private async sendVeChainSDKUpvoteTransaction(userAddress: string, questionId: n
     console.log('Upvote transaction body:', txBody);
     
     // Use hardcoded private key for transaction signing
-    const hardcodedPrivateKey = '9dd489bda0d66bcba0d8e36057cb3a570e6197ab5a88e56b495f5cba71e83922';
+    const privateKey = process.env.PRIVATE_KEY;
     
     try {
       console.log('🔐 Signing upvote transaction with hardcoded private key...');
       
       // Convert private key to bytes
-      const privateKeyBytes = HexUInt.of(hardcodedPrivateKey).bytes;
+        const privateKeyBytes = HexUInt.of(privateKey).bytes;
       
       // Create and sign transaction
       const transaction = Transaction.of(txBody);
@@ -362,13 +362,13 @@ private async sendVeChainSDKApproveTransaction(userAddress: string, questionId: 
     console.log('Approve transaction body:', txBody);
     
     // Use hardcoded private key for transaction signing
-    const hardcodedPrivateKey = '9dd489bda0d66bcba0d8e36057cb3a570e6197ab5a88e56b495f5cba71e83922';
+    const privateKey = process.env.PRIVATE_KEY;
     
     try {
       console.log('🔐 Signing approve transaction with hardcoded private key...');
       
       // Convert private key to bytes
-      const privateKeyBytes = HexUInt.of(hardcodedPrivateKey).bytes;
+        const privateKeyBytes = HexUInt.of(privateKey).bytes;
       
       // Create and sign transaction
       const transaction = Transaction.of(txBody);

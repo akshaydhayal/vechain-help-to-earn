@@ -7,12 +7,15 @@ import { contractAbi } from './contractAbi.js';
 export class VeChainContractService {
   private contractAddress: string;
   private thorClient: ThorClient;
-  private abi: ABIContract;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private abi: ABIContract<any>;
 
   constructor() {
     this.contractAddress = '0x25d137e1d0bf7f135706803cd7722946e483aecf';
-    this.thorClient = ThorClient.at("https://testnet.vechain.org");
-    this.abi = new ABIContract(contractAbi);
+    const testnetUrl = process.env.VECHAIN_TESTNET_URL || "https://testnet.vechain.org";
+    this.thorClient = ThorClient.at(testnetUrl);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    this.abi = new ABIContract(contractAbi as any);
     console.log('VeChain Contract Service initialized');
   }
 
@@ -27,7 +30,8 @@ export class VeChainContractService {
       );
       
       if (result.success && result.result) {
-        const [totalQuestions, totalAnswers, totalUsers, contractBalance] = result.result.plain;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const [totalQuestions, totalAnswers, totalUsers, contractBalance] = result.result.plain as any[];
         return {
           totalQuestions: totalQuestions.toString(),
           totalAnswers: totalAnswers.toString(),
@@ -59,6 +63,7 @@ export class VeChainContractService {
       );
       
       if (result.success && result.result) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const [
           id,
           asker,
@@ -69,7 +74,8 @@ export class VeChainContractService {
           hasApprovedAnswer,
           approvedAnswerId,
           timestamp
-        ] = result.result.plain;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ] = result.result.plain as any[];
         
         return {
           id: Number(id),
@@ -79,7 +85,7 @@ export class VeChainContractService {
           bounty: (Number(bounty) / 1e18).toFixed(2), // Convert from Wei to VET
           isActive: isActive,
           hasApprovedAnswer: hasApprovedAnswer,
-          approvedAnswerId: Number(approvedAnswerId),
+          approvedAnswerId: approvedAnswerId.toString(),
           timestamp: Number(timestamp)
         };
       }
@@ -133,7 +139,8 @@ export class VeChainContractService {
               hasApprovedAnswer,
               approvedAnswerId,
               timestamp
-            ] = questionResult.result.plain;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ] = questionResult.result.plain as any[];
             
             questions.push({
               id: Number(id),
@@ -143,7 +150,7 @@ export class VeChainContractService {
               bounty: (Number(bounty) / 1e18).toFixed(2), // Convert from Wei to VET
               isActive: isActive,
               hasApprovedAnswer: hasApprovedAnswer,
-              approvedAnswerId: Number(approvedAnswerId),
+              approvedAnswerId: approvedAnswerId.toString(),
               timestamp: Number(timestamp)
             });
           }
@@ -181,7 +188,8 @@ export class VeChainContractService {
           upvotes,
           isApproved,
           timestamp
-        ] = result.result.plain;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ] = result.result.plain as any[];
         
         return {
           id: Number(id),
@@ -241,7 +249,8 @@ export class VeChainContractService {
               upvotes,
               isApproved,
               timestamp
-            ] = answerResult.result.plain;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ] = answerResult.result.plain as any[];
             
             answers.push({
               id: Number(id),
@@ -296,7 +305,8 @@ export class VeChainContractService {
       );
       
       if (result.success && result.result) {
-        const [wallet, reputation, questionsAsked, answersGiven, answersApproved] = result.result.plain;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const [wallet, reputation, questionsAsked, answersGiven, answersApproved] = result.result.plain as any[];
         return {
           wallet: wallet,
           reputation: Number(reputation),
@@ -337,7 +347,8 @@ export class VeChainContractService {
       );
       
       if (result.success && result.result) {
-        return result.result.plain;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return result.result.plain as any;
       }
       return false;
       

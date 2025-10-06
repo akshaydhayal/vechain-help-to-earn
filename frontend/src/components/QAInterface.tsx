@@ -20,15 +20,15 @@ interface Question {
   timestamp: number;
 }
 
-interface Answer {
-  id: number;
-  questionId: number;
-  answerer: string;
-  content: string;
-  upvotes: number;
-  isApproved: boolean;
-  timestamp: number;
-}
+// interface Answer { // Unused
+//   id: number;
+//   questionId: number;
+//   answerer: string;
+//   content: string;
+//   upvotes: number;
+//   isApproved: boolean;
+//   timestamp: number;
+// }
 
 interface PlatformStats {
   totalQuestions: string;
@@ -40,27 +40,18 @@ export function QAInterface() {
   const { account, isConnected } = useWallet();
   const [stats, setStats] = useState<PlatformStats | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [answers, setAnswers] = useState<{ [questionId: number]: Answer[] }>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Form states
-  const [questionTitle, setQuestionTitle] = useState('');
-  const [questionDescription, setQuestionDescription] = useState('');
-  const [questionBounty, setQuestionBounty] = useState('0.1');
-  const [newAnswer, setNewAnswer] = useState('');
-  const [selectedQuestionId, setSelectedQuestionId] = useState<number | null>(null);
-  
   // Transaction states
   const [isTransactionPending, setIsTransactionPending] = useState(false);
-  const [lastTransactionHash, setLastTransactionHash] = useState<string | null>(null);
   
   
   // Modal state
   const [isAskQuestionModalOpen, setIsAskQuestionModalOpen] = useState(false);
   
   // Toaster notifications
-  const { notifications, showTransactionSuccess, showTransactionError, removeNotification } = useToaster();
+  const { notifications, showTransactionSuccess, removeNotification } = useToaster();
 
   useEffect(() => {
     if (isConnected && account) {
@@ -84,18 +75,9 @@ export function QAInterface() {
       const contractQuestions = await vechainContractService.getAllQuestions();
       setQuestions(contractQuestions);
       
-      // Load answers for each question
-      const answersData: { [questionId: number]: Answer[] } = {};
-      for (const question of contractQuestions) {
-        const questionAnswers = await vechainContractService.getQuestionAnswers(question.id);
-        answersData[question.id] = questionAnswers;
-      }
-      setAnswers(answersData);
-      
       console.log('Platform data loaded from contract:', {
         stats: platformStats,
-        questions: contractQuestions,
-        answers: answersData
+        questions: contractQuestions
       });
       
     } catch (err) {
@@ -118,8 +100,8 @@ export function QAInterface() {
       setError(null);
       
       console.log('🚀 Sending REAL VeChain testnet transaction via VeChain SDK...');
-      console.log('Question Title:', questionTitle);
-      console.log('Question Description:', questionDescription);
+      console.log('Question Title:', title);
+      console.log('Question Description:', description);
       
       // Use VeChain SDK Transaction Service for real blockchain transactions
       // Hardcoded private key will handle transaction signing
@@ -130,7 +112,6 @@ export function QAInterface() {
         account || undefined
       );
       
-      setLastTransactionHash(txHash);
       console.log('✅ REAL VeChain testnet transaction sent:', txHash);
       showTransactionSuccess(txHash);
       

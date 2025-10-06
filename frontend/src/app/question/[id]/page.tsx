@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useWallet } from '@/components/ClientOnlyVeChainKit';
 import { vechainContractService } from '@/utils/vechainContractService';
@@ -47,13 +47,7 @@ export default function QuestionPage() {
   
   const { notifications, showTransactionSuccess, showTransactionError, removeNotification } = useToaster();
 
-  useEffect(() => {
-    if (questionId) {
-      loadQuestionData();
-    }
-  }, [questionId]);
-
-  const loadQuestionData = async () => {
+  const loadQuestionData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -72,7 +66,13 @@ export default function QuestionPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [questionId]);
+
+  useEffect(() => {
+    if (questionId) {
+      loadQuestionData();
+    }
+  }, [questionId, loadQuestionData]);
 
   const handleSubmitAnswer = async () => {
     if (!answerContent.trim() || !account) return;

@@ -61,7 +61,23 @@ export function ClientOnlyVeChainKit({ children }: { children: React.ReactNode }
       // Method 2: Try request method (EIP-1193 standard)
       else if ('request' in window.vechain && typeof window.vechain.request === 'function') {
         console.log('Trying request method...');
-        result = await (window.vechain as { request: (params: { method: string; params?: unknown[] }) => Promise<string[]> }).request({ method: 'eth_requestAccounts' });
+        try {
+          result = await (window.vechain as { request: (params: { method: string; params?: unknown[] }) => Promise<string[]> }).request({ method: 'eth_requestAccounts' });
+        } catch (error) {
+          console.log('eth_requestAccounts failed, trying alternative methods...', error);
+          // Try alternative methods
+          try {
+            result = await (window.vechain as { request: (params: { method: string; params?: unknown[] }) => Promise<string[]> }).request({ method: 'vechain_requestAccounts' });
+          } catch (altError) {
+            console.log('vechain_requestAccounts also failed, trying personal_accounts...', altError);
+            try {
+              result = await (window.vechain as { request: (params: { method: string; params?: unknown[] }) => Promise<string[]> }).request({ method: 'personal_accounts' });
+            } catch (finalError) {
+              console.log('All request methods failed:', finalError);
+              throw new Error('Wallet connection failed: All request methods not supported');
+            }
+          }
+        }
       }
       // Method 3: Try newConnexSigner without connect method
       else if (window.vechain.newConnexSigner) {
@@ -71,12 +87,22 @@ export function ClientOnlyVeChainKit({ children }: { children: React.ReactNode }
         console.log('Signer methods:', Object.keys(signer));
         
         // Try different signer methods
-        if ('request' in signer && typeof signer.request === 'function') {
-          result = await (signer as { request: (params: { method: string; params?: unknown[] }) => Promise<string[]> }).request({ method: 'eth_requestAccounts' });
-        } else if ('connect' in signer && typeof signer.connect === 'function') {
+        if ('connect' in signer && typeof signer.connect === 'function') {
           result = await (signer as { connect: () => Promise<{ account: string; verified: boolean }> }).connect();
         } else if ('getAccount' in signer && typeof signer.getAccount === 'function') {
           result = await (signer as { getAccount: () => Promise<string> }).getAccount();
+        } else if ('request' in signer && typeof signer.request === 'function') {
+          try {
+            result = await (signer as { request: (params: { method: string; params?: unknown[] }) => Promise<string[]> }).request({ method: 'eth_requestAccounts' });
+          } catch (requestError) {
+            console.log('Signer eth_requestAccounts failed, trying alternative...', requestError);
+            try {
+              result = await (signer as { request: (params: { method: string; params?: unknown[] }) => Promise<string[]> }).request({ method: 'vechain_requestAccounts' });
+            } catch (altError) {
+              console.log('Signer vechain_requestAccounts also failed:', altError);
+              throw new Error('All signer request methods failed');
+            }
+          }
         } else {
           throw new Error('newConnexSigner returned object without expected methods');
         }
@@ -111,9 +137,28 @@ export function ClientOnlyVeChainKit({ children }: { children: React.ReactNode }
       }
     } catch (error) {
       console.error('Failed to connect to VeWorld:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      
+      // Provide more specific error messages
+      let errorMessage = 'Failed to connect to VeWorld wallet';
+      if (error instanceof Error) {
+        if (error.message.includes('User rejected')) {
+          errorMessage = 'Connection cancelled by user';
+        } else if (error.message.includes('not supported')) {
+          errorMessage = 'VeWorld wallet not detected. Please install VeWorld wallet and refresh the page.';
+        } else if (error.message.includes('All request methods failed')) {
+          errorMessage = 'Wallet connection methods not supported. Please try refreshing the page.';
+        } else if (error.message.includes('Attempt failed')) {
+          errorMessage = 'Wallet connection attempt failed. Please ensure VeWorld wallet is installed and unlocked.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       console.error('Error details:', errorMessage);
-      alert(`Failed to connect to VeWorld wallet: ${errorMessage}. Please try again.`);
+      setIsConnected(false);
+      setAccount(null);
+      localStorage.removeItem('vechain-wallet-connected');
+      localStorage.removeItem('vechain-wallet-address');
     }
   };
 

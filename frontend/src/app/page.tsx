@@ -5,7 +5,7 @@ import { Navbar } from '@/components/Navbar';
 import { useWallet } from '@/components/ClientOnlyVeChainKit';
 
 export default function Home() {
-  const { account, isConnected } = useWallet();
+  const { isConnected } = useWallet();
 
   return (
     <div className="min-h-screen bg-gray-900">
