@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { formatTimestamp, formatAddress } from '@/utils/timeUtils';
 
 interface Question {
@@ -16,20 +17,20 @@ interface Question {
 
 interface QuestionListProps {
   questions: Question[];
-  onQuestionClick: (questionId: number) => void;
   loading: boolean;
 }
 
-export function QuestionList({ questions, onQuestionClick, loading }: QuestionListProps) {
+export function QuestionList({ questions, loading }: QuestionListProps) {
+  const router = useRouter();
   if (loading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-white rounded-lg border p-6 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-            <div className="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
-            <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
-            <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+          <div key={i} className="bg-gray-800 rounded-lg border border-gray-600 p-4 animate-pulse">
+            <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
+            <div className="h-3 bg-gray-700 rounded w-1/2 mb-3"></div>
+            <div className="h-3 bg-gray-700 rounded w-full mb-2"></div>
+            <div className="h-3 bg-gray-700 rounded w-2/3"></div>
           </div>
         ))}
       </div>
@@ -38,35 +39,35 @@ export function QuestionList({ questions, onQuestionClick, loading }: QuestionLi
 
   if (questions.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="text-6xl mb-4">🤔</div>
-        <h3 className="text-xl font-semibold text-gray-700 mb-2">No questions yet</h3>
-        <p className="text-gray-500">Be the first to ask a question and start the conversation!</p>
+      <div className="text-center py-8">
+        <div className="text-4xl mb-3">🤔</div>
+        <h3 className="text-lg font-semibold text-gray-300 mb-2">No questions yet</h3>
+        <p className="text-gray-400">Be the first to ask a question and start the conversation!</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {questions.map((question) => (
         <div
           key={question.id}
-          onClick={() => onQuestionClick(question.id)}
-          className="bg-white rounded-lg border hover:border-blue-300 hover:shadow-md transition-all cursor-pointer p-6"
+          onClick={() => router.push(`/question/${question.id}`)}
+          className="bg-gray-800 rounded-lg border border-gray-600 hover:border-blue-400 hover:shadow-lg transition-all cursor-pointer p-4"
         >
           {/* Question Header */}
-          <div className="flex items-start justify-between mb-3">
+          <div className="flex items-start justify-between mb-2">
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+              <h3 className="text-base font-semibold text-white mb-1 line-clamp-2">
                 {question.title}
               </h3>
-              <p className="text-gray-600 text-sm line-clamp-2">
+              <p className="text-gray-300 text-sm line-clamp-2">
                 {question.description}
               </p>
             </div>
             {question.bounty && parseFloat(question.bounty) > 0 && (
               <div className="ml-4 flex-shrink-0">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-900 text-green-200">
                   💰 {question.bounty} VET
                 </span>
               </div>
@@ -74,10 +75,10 @@ export function QuestionList({ questions, onQuestionClick, loading }: QuestionLi
           </div>
 
           {/* Question Meta */}
-          <div className="flex items-center justify-between text-sm text-gray-500">
+          <div className="flex items-center justify-between text-sm text-gray-400">
             <div className="flex items-center space-x-4">
               <div className="flex items-center">
-                <span className="w-2 h-2 bg-gray-300 rounded-full mr-2"></span>
+                <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
                 <span>Asked by {formatAddress(question.asker)}</span>
               </div>
               <span>•</span>
@@ -86,12 +87,12 @@ export function QuestionList({ questions, onQuestionClick, loading }: QuestionLi
             
             <div className="flex items-center space-x-2">
               {question.hasApprovedAnswer && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-200">
                   ✅ Resolved
                 </span>
               )}
               {question.isActive && !question.hasApprovedAnswer && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-900 text-yellow-200">
                   🔍 Open
                 </span>
               )}

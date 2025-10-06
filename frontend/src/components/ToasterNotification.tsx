@@ -7,13 +7,15 @@ interface ToasterNotificationProps {
   type: 'success' | 'error' | 'info';
   duration?: number;
   onClose: () => void;
+  txHash?: string;
 }
 
 export function ToasterNotification({ 
   message, 
   type, 
-  duration = 5000, 
-  onClose 
+  duration = 10000, 
+  onClose,
+  txHash 
 }: ToasterNotificationProps) {
   const [isVisible, setIsVisible] = useState(true);
 
@@ -65,6 +67,16 @@ export function ToasterNotification({
             <div>
               <p className="font-semibold text-sm">{message}</p>
               <p className="text-xs opacity-90 mt-1">Transaction confirmed on VeChain</p>
+              {txHash && (
+                <a
+                  href={`https://explore-testnet.vechain.org/transactions/${txHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs underline hover:text-gray-200 mt-1 block"
+                >
+                  View on Explorer →
+                </a>
+              )}
             </div>
           </div>
           <button
@@ -89,11 +101,12 @@ export function useToaster() {
     message: string;
     type: 'success' | 'error' | 'info';
     duration?: number;
+    txHash?: string;
   }>>([]);
 
-  const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info', duration?: number) => {
+  const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info', duration?: number, txHash?: string) => {
     const id = Math.random().toString(36).substr(2, 9);
-    setNotifications(prev => [...prev, { id, message, type, duration }]);
+    setNotifications(prev => [...prev, { id, message, type, duration, txHash }]);
   };
 
   const removeNotification = (id: string) => {
@@ -102,7 +115,7 @@ export function useToaster() {
 
   const showTransactionSuccess = (txHash: string) => {
     const shortHash = `${txHash.slice(0, 6)}...${txHash.slice(-4)}`;
-    showNotification(`Transaction confirmed! Hash: ${shortHash}`, 'success', 6000);
+    showNotification(`Transaction confirmed! Hash: ${shortHash}`, 'success', 10000, txHash);
   };
 
   const showTransactionError = (error: string) => {

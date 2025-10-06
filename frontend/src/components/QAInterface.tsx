@@ -5,8 +5,8 @@ import { useWallet } from './ClientOnlyVeChainKit';
 import { vechainSDKTransactionService } from '@/utils/simpleTransactionService';
 import { vechainContractService } from '@/utils/vechainContractService';
 import { QuestionList } from './QuestionList';
-import { QuestionDetail } from './QuestionDetail';
-import { useToaster } from './ToasterNotification';
+import { AskQuestionModal } from './AskQuestionModal';
+import { useToaster, ToasterNotification } from './ToasterNotification';
 
 interface Question {
   id: number;
@@ -55,9 +55,9 @@ export function QAInterface() {
   const [isTransactionPending, setIsTransactionPending] = useState(false);
   const [lastTransactionHash, setLastTransactionHash] = useState<string | null>(null);
   
-  // View state
-  const [currentView, setCurrentView] = useState<'list' | 'detail'>('list');
-  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
+  
+  // Modal state
+  const [isAskQuestionModalOpen, setIsAskQuestionModalOpen] = useState(false);
   
   // Toaster notifications
   const { notifications, showTransactionSuccess, showTransactionError, removeNotification } = useToaster();
@@ -106,21 +106,9 @@ export function QAInterface() {
     }
   };
 
-  const handleQuestionClick = (questionId: number) => {
-    const question = questions.find(q => q.id === questionId);
-    if (question) {
-      setSelectedQuestion(question);
-      setCurrentView('detail');
-    }
-  };
 
-  const handleBackToList = () => {
-    setCurrentView('list');
-    setSelectedQuestion(null);
-  };
-
-  const handleAskQuestion = async () => {
-    if (!questionTitle.trim() || !questionDescription.trim() || !questionBounty) {
+  const handleAskQuestion = async (title: string, description: string, bounty: string) => {
+    if (!title.trim() || !description.trim() || !bounty) {
       alert('Please enter a question title, description, and bounty amount');
       return;
     }
@@ -135,21 +123,16 @@ export function QAInterface() {
       
       // Use VeChain SDK Transaction Service for real blockchain transactions
       // Hardcoded private key will handle transaction signing
-          const txHash = await vechainSDKTransactionService.askQuestion(
-            questionTitle,
-            questionDescription,
-            questionBounty, 
-            account || undefined
-          );
+      const txHash = await vechainSDKTransactionService.askQuestion(
+        title,
+        description,
+        bounty, 
+        account || undefined
+      );
       
       setLastTransactionHash(txHash);
       console.log('✅ REAL VeChain testnet transaction sent:', txHash);
       showTransactionSuccess(txHash);
-      
-      // Clear form
-      setQuestionTitle('');
-      setQuestionDescription('');
-      setQuestionBounty('0.1');
       
       // Reload data after transaction
       setTimeout(() => {
@@ -164,85 +147,6 @@ export function QAInterface() {
     }
   };
 
-  const handleSubmitAnswer = async (questionId: number, answer: string) => {
-    if (!answer.trim()) {
-      alert('Please enter an answer');
-      return;
-    }
-
-    try {
-      setIsTransactionPending(true);
-      setError(null);
-      
-      console.log('🚀 Sending REAL VeChain testnet transaction for submitAnswer via VeChain SDK...');
-      
-          const txHash = await vechainSDKTransactionService.submitAnswer(questionId, answer, account || undefined);
-      setLastTransactionHash(txHash);
-      console.log('✅ REAL VeChain testnet transaction sent:', txHash);
-      showTransactionSuccess(txHash);
-      
-      // Reload data after transaction
-      setTimeout(() => {
-        loadPlatformData();
-      }, 2000);
-      
-    } catch (err) {
-      console.error('Failed to submit answer:', err);
-      setError(`Failed to submit answer: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    } finally {
-      setIsTransactionPending(false);
-    }
-  };
-
-  const handleUpvoteAnswer = async (questionId: number, answerId: number) => {
-    try {
-      setIsTransactionPending(true);
-      setError(null);
-      
-      console.log('🚀 Sending REAL VeChain testnet transaction for upvoteAnswer via VeChain SDK...');
-      
-          const txHash = await vechainSDKTransactionService.upvoteAnswer(questionId, answerId, account || undefined);
-      setLastTransactionHash(txHash);
-      console.log('✅ REAL VeChain testnet transaction sent:', txHash);
-      showTransactionSuccess(txHash);
-      
-      // Reload data after transaction
-      setTimeout(() => {
-        loadPlatformData();
-      }, 2000);
-      
-        } catch (err: unknown) {
-          console.error('Failed to upvote answer:', err);
-          setError(`Failed to upvote answer: ${err instanceof Error ? err.message : 'Unknown error'}`);
-        } finally {
-          setIsTransactionPending(false);
-        }
-      };
-
-      const handleApproveAnswer = async (questionId: number, answerId: number) => {
-        try {
-          setIsTransactionPending(true);
-          setError(null);
-          
-          console.log('🚀 Sending REAL VeChain testnet transaction for approveAnswer via VeChain SDK...');
-          
-          const txHash = await vechainSDKTransactionService.approveAnswer(questionId, answerId, account || undefined);
-          setLastTransactionHash(txHash);
-          console.log('✅ REAL VeChain testnet transaction sent:', txHash);
-          showTransactionSuccess(txHash);
-          
-          // Reload data after transaction
-          setTimeout(() => {
-            loadPlatformData();
-          }, 2000);
-          
-        } catch (err: unknown) {
-          console.error('Failed to approve answer:', err);
-          setError(`Failed to approve answer: ${err instanceof Error ? err.message : 'Unknown error'}`);
-        } finally {
-          setIsTransactionPending(false);
-        }
-  };
 
   if (!isConnected) {
     return (
@@ -258,146 +162,126 @@ export function QAInterface() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 bg-gray-900 min-h-screen">
+
+
+      {/* Ask Question Button */}
+      <div className="mb-4">
+        <button
+          onClick={() => setIsAskQuestionModalOpen(true)}
+          className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-3 rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-600"
+        >
+          <div className="flex items-center justify-center space-x-2">
+            <span className="text-lg">💭</span>
+            <span className="text-base font-semibold">Ask a Question</span>
+          </div>
+        </button>
+      </div>
+
+      {/* Questions List */}
+      <div className="bg-gradient-to-br from-gray-800 to-gray-700 rounded-lg shadow-lg border border-gray-600 p-6">
+        <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
+          <span className="mr-2">❓</span>
+          Community Questions
+        </h2>
+        <QuestionList
+          questions={questions}
+          loading={loading}
+        />
+      </div>
+
+      {/* Wallet Details */}
+      <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-600 p-4">
+        <h2 className="text-xl font-bold text-white mb-3">
+          🎉 Wallet Connected Successfully!
+        </h2>
+        <div className="space-y-2">
+          <div>
+            <span className="font-medium text-gray-300">Account:</span>
+            <span className="ml-2 font-mono text-sm bg-gray-700 text-gray-200 px-2 py-1 rounded">
+              {account}
+            </span>
+          </div>
+          <div>
+            <span className="font-medium text-gray-300">Connection Type:</span>
+            <span className="ml-2 text-sm text-green-400">
+              VeWorld Wallet
+            </span>
+          </div>
+          <div>
+            <span className="font-medium text-gray-300">Network:</span>
+            <span className="ml-2 text-sm text-green-400">
+              VeChain Testnet
+            </span>
+          </div>
+          <div>
+            <span className="font-medium text-gray-300">Contract Address:</span>
+            <span className="ml-2 font-mono text-xs bg-gray-700 text-gray-200 px-2 py-1 rounded">
+              0x25d137e1d0bf7f135706803cd7722946e483aecf
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Platform Stats */}
       {stats && (
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Platform Statistics</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-3xl font-bold text-blue-600">{stats.totalQuestions}</div>
-              <div className="text-sm text-gray-600">Total Questions</div>
+        <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-600 p-4">
+          <h2 className="text-xl font-bold text-white mb-3">Platform Statistics</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="text-center p-3 bg-gray-700 rounded-lg border border-gray-600">
+              <div className="text-2xl font-bold text-blue-400">{stats.totalQuestions}</div>
+              <div className="text-xs text-gray-300">Total Questions</div>
             </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-3xl font-bold text-green-600">{stats.totalAnswers}</div>
-              <div className="text-sm text-gray-600">Total Answers</div>
+            <div className="text-center p-3 bg-gray-700 rounded-lg border border-gray-600">
+              <div className="text-2xl font-bold text-green-400">{stats.totalAnswers}</div>
+              <div className="text-xs text-gray-300">Total Answers</div>
             </div>
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <div className="text-3xl font-bold text-purple-600">{stats.totalUsers}</div>
-              <div className="text-sm text-gray-600">Total Users</div>
+            <div className="text-center p-3 bg-gray-700 rounded-lg border border-gray-600">
+              <div className="text-2xl font-bold text-purple-400">{stats.totalUsers}</div>
+              <div className="text-xs text-gray-300">Total Users</div>
             </div>
           </div>
         </div>
       )}
 
-
-      {/* Ask Question Form */}
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Ask a Question</h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Question Title
-            </label>
-            <input
-              type="text"
-              value={questionTitle}
-              onChange={(e) => setQuestionTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter a brief title for your question"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Question Description
-            </label>
-            <textarea
-              value={questionDescription}
-              onChange={(e) => setQuestionDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={4}
-              placeholder="Provide detailed description of your question..."
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Bounty (VET)
-            </label>
-            <input
-              type="number"
-              value={questionBounty}
-              onChange={(e) => setQuestionBounty(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="0.1"
-              step="0.01"
-              min="0"
-            />
-          </div>
-          <button
-            onClick={handleAskQuestion}
-            disabled={isTransactionPending || !questionTitle.trim() || !questionDescription.trim()}
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isTransactionPending ? 'Sending to VeChain Testnet...' : '🚀 Ask Question (Real Blockchain)'}
-          </button>
-        </div>
-      </div>
-
-      {/* Questions List */}
-      <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-xl shadow-lg border border-green-200 p-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center">
-          <span className="mr-3">❓</span>
-          Community Questions
-        </h2>
-        {currentView === 'list' ? (
-          <QuestionList
-            questions={questions}
-            onQuestionClick={handleQuestionClick}
-            loading={loading}
-          />
-        ) : selectedQuestion ? (
-          <QuestionDetail
-            question={selectedQuestion}
-            answers={answers[selectedQuestion.id] || []}
-            onAnswerSubmit={handleSubmitAnswer}
-            onUpvote={handleUpvoteAnswer}
-            onApprove={handleApproveAnswer}
-            onBack={handleBackToList}
-            isTransactionPending={isTransactionPending}
-            currentUser={account || ''}
-          />
-        ) : null}
-      </div>
-
-
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="text-red-800">{error}</div>
+        <div className="bg-red-900 border border-red-600 rounded-lg p-4">
+          <div className="text-red-200">{error}</div>
         </div>
       )}
 
       {/* Loading Indicator */}
       {loading && (
         <div className="text-center py-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto"></div>
+          <p className="mt-2 text-gray-300">Loading...</p>
         </div>
       )}
 
 
+      {/* Ask Question Modal */}
+      <AskQuestionModal
+        isOpen={isAskQuestionModalOpen}
+        onClose={() => setIsAskQuestionModalOpen(false)}
+        onSubmit={handleAskQuestion}
+        isTransactionPending={isTransactionPending}
+        currentUser={account || ''}
+      />
+
       {/* Toaster Notifications */}
       {notifications.map((notification) => (
-        <div key={notification.id} className="fixed top-4 right-4 z-50">
-          <div className="bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg max-w-md transform transition-all duration-300 translate-x-0 opacity-100">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <span className="text-lg">✅</span>
-                <div>
-                  <p className="font-semibold text-sm">{notification.message}</p>
-                  <p className="text-xs opacity-90 mt-1">Transaction confirmed on VeChain</p>
-                </div>
-              </div>
-              <button
-                onClick={() => removeNotification(notification.id)}
-                className="ml-4 text-white hover:text-gray-200 transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-          </div>
-        </div>
+        <ToasterNotification
+          key={notification.id}
+          message={notification.message}
+          type={notification.type}
+          duration={notification.duration}
+          txHash={notification.txHash}
+          onClose={() => removeNotification(notification.id)}
+        />
       ))}
     </div>
   );
 }
+
+

@@ -47,6 +47,51 @@ export class VeChainContractService {
     }
   }
 
+  // Get a specific question by ID
+  async getQuestion(questionId: number) {
+    try {
+      console.log(`Fetching question ${questionId} from contract...`);
+      
+      const result = await this.thorClient.contracts.executeCall(
+        this.contractAddress,
+        this.abi.getFunction("getQuestion"),
+        [questionId.toString()]
+      );
+      
+      if (result.success && result.result) {
+        const [
+          id,
+          asker,
+          title,
+          description,
+          bounty,
+          isActive,
+          hasApprovedAnswer,
+          approvedAnswerId,
+          timestamp
+        ] = result.result.plain;
+        
+        return {
+          id: Number(id),
+          asker: asker,
+          title: title,
+          description: description,
+          bounty: (Number(bounty) / 1e18).toFixed(2), // Convert from Wei to VET
+          isActive: isActive,
+          hasApprovedAnswer: hasApprovedAnswer,
+          approvedAnswerId: Number(approvedAnswerId),
+          timestamp: Number(timestamp)
+        };
+      }
+      
+      throw new Error(`Question ${questionId} not found`);
+      
+    } catch (error) {
+      console.error(`Error fetching question ${questionId}:`, error);
+      throw error;
+    }
+  }
+
   // Get all questions
   async getAllQuestions() {
     try {
@@ -113,6 +158,47 @@ export class VeChainContractService {
     } catch (error) {
       console.error('Error fetching questions:', error);
       return [];
+    }
+  }
+
+  // Get a specific answer by ID
+  async getAnswer(answerId: number) {
+    try {
+      console.log(`Fetching answer ${answerId} from contract...`);
+      
+      const result = await this.thorClient.contracts.executeCall(
+        this.contractAddress,
+        this.abi.getFunction("getAnswer"),
+        [answerId.toString()]
+      );
+      
+      if (result.success && result.result) {
+        const [
+          id,
+          questionId,
+          answerer,
+          content,
+          upvotes,
+          isApproved,
+          timestamp
+        ] = result.result.plain;
+        
+        return {
+          id: Number(id),
+          questionId: Number(questionId),
+          answerer: answerer,
+          content: content,
+          upvotes: Number(upvotes),
+          isApproved: isApproved,
+          timestamp: Number(timestamp)
+        };
+      }
+      
+      throw new Error(`Answer ${answerId} not found`);
+      
+    } catch (error) {
+      console.error(`Error fetching answer ${answerId}:`, error);
+      throw error;
     }
   }
 

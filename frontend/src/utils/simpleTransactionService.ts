@@ -113,10 +113,9 @@ export class VeChainSDKTransactionService {
     }
   }
 
-  async upvoteAnswer(questionId: number, answerId: number, userAddress?: string): Promise<string> {
+  async upvoteAnswer(answerId: number, userAddress?: string): Promise<string> {
     try {
       console.log('🚀 Sending REAL VeChain testnet transaction for upvoteAnswer via VeChain SDK...');
-      console.log('Question ID:', questionId);
       console.log('Answer ID:', answerId);
 
       // Get user's wallet address - try passed address first, then auto-detect
@@ -135,7 +134,7 @@ export class VeChainSDKTransactionService {
       console.log('User address:', address);
       
       // Use VeChain SDK to build and send transaction with hardcoded private key
-      return await this.sendVeChainSDKUpvoteTransaction(address, questionId, answerId);
+      return await this.sendVeChainSDKUpvoteTransaction(address, answerId);
       
     } catch (error) {
       console.error('Failed to send VeChain SDK transaction for upvoteAnswer:', error);
@@ -146,10 +145,9 @@ export class VeChainSDKTransactionService {
     }
   }
 
-  async approveAnswer(questionId: number, answerId: number, userAddress?: string): Promise<string> {
+  async approveAnswer(answerId: number, userAddress?: string): Promise<string> {
     try {
       console.log('🚀 Sending REAL VeChain testnet transaction for approveAnswer via VeChain SDK...');
-      console.log('Question ID:', questionId);
       console.log('Answer ID:', answerId);
 
       // Get user's wallet address - try passed address first, then auto-detect
@@ -168,7 +166,7 @@ export class VeChainSDKTransactionService {
       console.log('User address:', address);
       
       // Use VeChain SDK to build and send transaction with hardcoded private key
-      return await this.sendVeChainSDKApproveTransaction(address, questionId, answerId);
+      return await this.sendVeChainSDKApproveTransaction(address, answerId);
       
     } catch (error) {
       console.error('Failed to send VeChain SDK transaction for approveAnswer:', error);
@@ -456,7 +454,7 @@ export class VeChainSDKTransactionService {
     }
   }
 
-  private async sendVeChainSDKUpvoteTransaction(userAddress: string, questionId: number, answerId: number): Promise<string> {
+  private async sendVeChainSDKUpvoteTransaction(userAddress: string, answerId: number): Promise<string> {
     try {
       console.log('Building VeChain SDK upvote transaction...');
       
@@ -550,7 +548,7 @@ export class VeChainSDKTransactionService {
     }
   }
 
-  private async sendVeChainSDKApproveTransaction(userAddress: string, questionId: number, answerId: number): Promise<string> {
+  private async sendVeChainSDKApproveTransaction(userAddress: string, answerId: number): Promise<string> {
     try {
       console.log('Building VeChain SDK approve transaction...');
       
