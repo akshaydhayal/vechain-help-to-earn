@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { formatTimestamp, formatAddress } from '@/utils/timeUtils';
+import { getAvatarForAddress } from '@/utils/avatarGenerator';
 
 interface Question {
   id: number;
@@ -78,7 +79,11 @@ export function QuestionList({ questions, loading }: QuestionListProps) {
           <div className="flex items-center justify-between text-sm text-gray-400">
             <div className="flex items-center space-x-4">
               <div className="flex items-center">
-                <span className="w-2 h-2 bg-gray-500 rounded-full mr-2"></span>
+                <img 
+                  src={getAvatarForAddress(question.asker, 16)} 
+                  alt="User avatar" 
+                  className="w-4 h-4 rounded-full mr-2"
+                />
                 <span>Asked by {formatAddress(question.asker)}</span>
               </div>
               <span>•</span>
