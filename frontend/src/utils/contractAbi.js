@@ -281,6 +281,11 @@ export const contractAbi = [
         name: "_asker",
         type: "address",
       },
+      {
+        internalType: "string[]",
+        name: "_tags",
+        type: "string[]",
+      },
     ],
     name: "askQuestion",
     outputs: [],
@@ -420,11 +425,6 @@ export const contractAbi = [
       },
       {
         internalType: "bool",
-        name: "isActive",
-        type: "bool",
-      },
-      {
-        internalType: "bool",
         name: "hasApprovedAnswer",
         type: "bool",
       },
@@ -432,6 +432,16 @@ export const contractAbi = [
         internalType: "uint256",
         name: "approvedAnswerId",
         type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "upvotes",
+        type: "uint256",
+      },
+      {
+        internalType: "string[]",
+        name: "tags",
+        type: "string[]",
       },
       {
         internalType: "uint256",
@@ -692,6 +702,24 @@ export const contractAbi = [
       },
     ],
     name: "upvoteAnswer",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_questionId",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_voter",
+        type: "address",
+      },
+    ],
+    name: "upvoteQuestion",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

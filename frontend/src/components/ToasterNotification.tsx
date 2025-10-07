@@ -66,7 +66,9 @@ export function ToasterNotification({
             <span className="text-lg">{getIcon()}</span>
             <div>
               <p className="font-semibold text-sm">{message}</p>
-              <p className="text-xs opacity-90 mt-1">Transaction confirmed on VeChain</p>
+              {type === 'success' && (
+                <p className="text-xs opacity-90 mt-1">Transaction confirmed on VeChain</p>
+              )}
               {txHash && (
                 <a
                   href={`https://explore-testnet.vechain.org/transactions/${txHash}`}
@@ -106,7 +108,12 @@ export function useToaster() {
 
   const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'info', duration?: number, txHash?: string) => {
     const id = Math.random().toString(36).substr(2, 9);
-    setNotifications(prev => [...prev, { id, message, type, duration, txHash }]);
+    console.log('🚨 Toaster: Adding notification:', { id, message, type, duration, txHash });
+    setNotifications(prev => {
+      const newNotifications = [...prev, { id, message, type, duration, txHash }];
+      console.log('🚨 Toaster: Updated notifications array:', newNotifications);
+      return newNotifications;
+    });
   };
 
   const removeNotification = (id: string) => {
@@ -119,6 +126,7 @@ export function useToaster() {
   };
 
   const showTransactionError = (error: string) => {
+    console.log('🚨 Toaster: Showing error notification:', error);
     showNotification(`Transaction failed: ${error}`, 'error', 8000);
   };
 

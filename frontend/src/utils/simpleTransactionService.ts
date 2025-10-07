@@ -9,7 +9,7 @@ export class VeChainSDKTransactionService {
   private provider: unknown;
 
   constructor() {
-    this.contractAddress = '0x26dcef1017f34787f6fc86f47aa025b480c0911a'; // Updated contract address with user address parameters
+    this.contractAddress = '0xf331dc138fdc90633c3176b2a9a80e9d2b13a8e2'; // Updated contract address with question upvotes, tags, and fixed answer upvoting
     console.log('VeChain SDK transaction service initialized');
     this.initializeVeChainSDK();
   }
@@ -30,7 +30,7 @@ export class VeChainSDKTransactionService {
     }
   }
 
-  async askQuestion(title: string, description: string, bounty: string, userAddress?: string): Promise<string> {
+  async askQuestion(title: string, description: string, bounty: string, tags: string[], userAddress?: string): Promise<string> {
     try {
       console.log('🚀 Sending REAL VeChain testnet transaction via VeChain SDK...');
       console.log('Question Title:', title);
@@ -53,14 +53,12 @@ export class VeChainSDKTransactionService {
       console.log('User address:', address);
       
           // Use VeChain SDK to build and send transaction with hardcoded private key
-          return await this.sendVeChainSDKTransaction(address, title, description, bounty);
+          return await this.sendVeChainSDKTransaction(address, title, description, bounty, tags);
       
     } catch (error) {
       console.error('Failed to send VeChain SDK transaction:', error);
-      // Return mock transaction hash as fallback
-      const mockTxHash = `0x${Math.random().toString(16).substr(2, 64)}`;
-      console.log('✅ Fallback mock transaction hash generated:', mockTxHash);
-      return mockTxHash;
+      // Re-throw the error instead of returning a mock hash
+      throw error;
     }
   }
 
@@ -106,10 +104,8 @@ export class VeChainSDKTransactionService {
       
     } catch (error) {
       console.error('Failed to send VeChain SDK transaction for submitAnswer:', error);
-      // Return mock transaction hash as fallback
-      const mockTxHash = `0x${Math.random().toString(16).substr(2, 64)}`;
-      console.log('✅ Fallback mock transaction hash generated:', mockTxHash);
-      return mockTxHash;
+      // Re-throw the error instead of returning a mock hash
+      throw error;
     }
   }
 
@@ -138,10 +134,8 @@ export class VeChainSDKTransactionService {
       
     } catch (error) {
       console.error('Failed to send VeChain SDK transaction for upvoteAnswer:', error);
-      // Return mock transaction hash as fallback
-      const mockTxHash = `0x${Math.random().toString(16).substr(2, 64)}`;
-      console.log('✅ Fallback mock transaction hash generated:', mockTxHash);
-      return mockTxHash;
+      // Re-throw the error instead of returning a mock hash
+      throw error;
     }
   }
 
@@ -170,10 +164,8 @@ export class VeChainSDKTransactionService {
       
     } catch (error) {
       console.error('Failed to send VeChain SDK transaction for approveAnswer:', error);
-      // Return mock transaction hash as fallback
-      const mockTxHash = `0x${Math.random().toString(16).substr(2, 64)}`;
-      console.log('✅ Fallback mock transaction hash generated:', mockTxHash);
-      return mockTxHash;
+      // Re-throw the error instead of returning a mock hash
+      throw error;
     }
   }
 
@@ -251,7 +243,7 @@ export class VeChainSDKTransactionService {
     }
   }
 
-  private async sendVeChainSDKTransaction(userAddress: string, title: string, description: string, bounty: string): Promise<string> {
+  private async sendVeChainSDKTransaction(userAddress: string, title: string, description: string, bounty: string, tags: string[]): Promise<string> {
     try {
       console.log('Building VeChain SDK transaction...');
       
@@ -269,7 +261,8 @@ export class VeChainSDKTransactionService {
         inputs: [
           { name: '_title', type: 'string' },
           { name: '_description', type: 'string' },
-          { name: '_asker', type: 'address' }
+          { name: '_asker', type: 'address' },
+          { name: '_tags', type: 'string[]' }
         ],
         outputs: [],
         constant: false,
@@ -286,7 +279,7 @@ export class VeChainSDKTransactionService {
             Clause.callFunction(
               Address.of(this.contractAddress),
               askQuestionABI,
-              [title, description, userAddress], // Using separate title, description, and asker address
+              [title, description, userAddress, tags], // Using separate title, description, asker address, and tags
               bountyVET
             )
           ];
@@ -545,9 +538,19 @@ export class VeChainSDKTransactionService {
         
         console.log('✅ Upvote transaction confirmed!');
         console.log('Upvote transaction receipt:', receipt);
+        
         if (receipt) {
           console.log('Gas used:', receipt.gasUsed);
           console.log('Upvote transaction successful:', !receipt.reverted);
+          
+          // Check if transaction was reverted
+          if (receipt.reverted) {
+            console.error('❌ Upvote transaction was reverted!');
+            
+            // Since we can't easily extract the exact revert reason from VeChain SDK,
+            // we'll provide a generic but helpful error message
+            throw new Error('Upvote failed: Transaction was reverted. This could be because you already upvoted this answer, you\'re trying to upvote your own answer, or the answer doesn\'t exist.');
+          }
         }
         
         return transactionResult.id;
@@ -660,6 +663,187 @@ export class VeChainSDKTransactionService {
       console.error('Failed to build VeChain SDK approve transaction:', error);
       throw error;
     }
+  }
+
+  // Upvote a question
+  async upvoteQuestion(questionId: number, userAddress?: string): Promise<string> {
+    try {
+      console.log('🚀 Sending REAL VeChain testnet transaction for upvoteQuestion via VeChain SDK...');
+      console.log('Question ID:', questionId);
+
+      // Get user's wallet address - try passed address first, then auto-detect
+      let address = userAddress;
+      if (!address) {
+        address = await this.getUserAddress() || undefined;
+      }
+      
+      if (!address) {
+        throw new Error('User address is required for upvoting questions');
+      }
+
+      console.log('User address:', address);
+      
+      // Use VeChain SDK to build and send transaction with hardcoded private key
+      return await this.sendVeChainSDKUpvoteQuestionTransaction(address, questionId);
+      
+    } catch (error) {
+      console.error('Failed to send VeChain SDK transaction:', error);
+      throw error;
+    }
+  }
+
+  private async sendVeChainSDKUpvoteQuestionTransaction(address: string, questionId: number): Promise<string> {
+    try {
+      const { ABIFunction, Clause, Address, VET, Transaction, HexUInt } = await import('@vechain/sdk-core');
+      const { ThorClient } = await import('@vechain/sdk-network');
+      
+      // Initialize Thor client
+      const TESTNET_URL = process.env.VECHAIN_TESTNET_URL || "https://testnet.vechain.org";
+      const thorClient = ThorClient.at(TESTNET_URL);
+      
+      // Create ABI function for upvoteQuestion
+      const upvoteQuestionABI = new ABIFunction({
+        name: 'upvoteQuestion',
+        inputs: [
+          { name: '_questionId', type: 'uint256' },
+          { name: '_voter', type: 'address' }
+        ],
+        outputs: [],
+        constant: false,
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'function'
+      });
+      
+      // Create clause for upvoteQuestion function call (no VET transfer needed)
+      const clauses = [
+        Clause.callFunction(
+          Address.of(this.contractAddress),
+          upvoteQuestionABI,
+          [questionId, address], // questionId and voter address
+          VET.of(0) // No VET transfer for question upvotes
+        )
+      ];
+      
+      console.log('Upvote question transaction clauses:', clauses);
+      
+      // Estimate gas
+      const gasEstimation = await thorClient.gas.estimateGas(clauses);
+      console.log('Gas estimation for upvote question:', gasEstimation);
+      
+      if (gasEstimation.reverted) {
+        throw new Error(`Transaction would revert: ${gasEstimation.revertReasons.join(', ')}`);
+      }
+      
+      // Get current block reference
+      const bestBlockRef = await thorClient.blocks.getBestBlockRef();
+      if (!bestBlockRef) {
+        throw new Error('Failed to get best block reference');
+      }
+      const blockRef = bestBlockRef.slice(0, 18); // Take first 8 bytes of block ID
+      
+      // Build transaction
+      const transactionBody = {
+        chainTag: 39, // VeChain testnet chain tag
+        blockRef: blockRef,
+        expiration: 720, // 720 blocks = ~3 hours
+        clauses: clauses,
+        gasPriceCoef: 0,
+        gas: gasEstimation.totalGas,
+        dependsOn: null,
+        nonce: Math.floor(Math.random() * 1000000)
+      };
+      
+      console.log('Upvote question transaction body:', transactionBody);
+      
+      // Sign transaction with hardcoded private key
+      const privateKey = process.env.PRIVATE_KEY || '9dd489bda0d66bcba0d8e36057cb3a570e6197ab5a88e56b495f5cba71e83922';
+      console.log('🔐 Signing upvote question transaction with hardcoded private key...');
+      
+      // Convert private key to bytes
+      const privateKeyBytes = HexUInt.of(privateKey).bytes;
+      
+      // Create and sign transaction
+      const transaction = Transaction.of(transactionBody);
+      const signedTransaction = transaction.sign(privateKeyBytes);
+      console.log('✅ Upvote question transaction signed successfully');
+      
+      // Send transaction
+      console.log('🚀 Sending real upvote question transaction to VeChain testnet...');
+      const transactionResult = await thorClient.transactions.sendTransaction(signedTransaction);
+      console.log('✅ REAL VeChain testnet upvote question transaction sent!');
+      console.log('Upvote Question Transaction ID:', transactionResult.id);
+      
+      // Wait for transaction to be confirmed
+      console.log('⏳ Waiting for upvote question transaction confirmation...');
+      const receipt = await thorClient.transactions.getTransactionReceipt(transactionResult.id);
+      console.log('✅ Upvote question transaction confirmed!');
+      console.log('Upvote question transaction receipt:', receipt);
+      
+      if (receipt) {
+        console.log('Gas used:', receipt.gasUsed);
+        console.log('Upvote question transaction successful:', !receipt.reverted);
+        
+        // Check if transaction was reverted
+        if (receipt.reverted) {
+          console.error('❌ Upvote question transaction was reverted!');
+          
+          // Since we can't easily extract the exact revert reason from VeChain SDK,
+          // we'll provide a generic but helpful error message
+          throw new Error('Upvote question failed: Transaction was reverted. This could be because you already upvoted this question, you\'re trying to upvote your own question, or the question doesn\'t exist.');
+        }
+      }
+      
+      return transactionResult.id;
+      
+    } catch (signError) {
+      console.error('Failed to sign or send upvote question transaction:', signError);
+      throw new Error(`Upvote question transaction failed: ${signError instanceof Error ? signError.message : 'Unknown error'}`);
+    }
+  }
+
+  // Map revert reasons to user-friendly messages
+  private mapRevertReasonToMessage(revertReason: string): string {
+    const reason = revertReason.toLowerCase();
+    
+    // Answer upvote errors
+    if (reason.includes('cannot upvote your own answer')) {
+      return 'You cannot upvote your own answer';
+    }
+    if (reason.includes('already upvoted this answer')) {
+      return 'You have already upvoted this answer';
+    }
+    if (reason.includes('answer does not exist')) {
+      return 'This answer does not exist';
+    }
+    
+    // Question upvote errors
+    if (reason.includes('cannot upvote your own question')) {
+      return 'You cannot upvote your own question';
+    }
+    if (reason.includes('already upvoted this question')) {
+      return 'You have already upvoted this question';
+    }
+    if (reason.includes('question does not exist')) {
+      return 'This question does not exist';
+    }
+    
+    // General errors
+    if (reason.includes('user not registered')) {
+      return 'User is not registered on the platform';
+    }
+    if (reason.includes('insufficient gas')) {
+      return 'Insufficient gas to complete the transaction';
+    }
+    if (reason.includes('transaction was reverted')) {
+      return 'Transaction was reverted by the smart contract';
+    }
+    if (reason.includes('voter address cannot be zero')) {
+      return 'Invalid voter address';
+    }
+    
+    // Default message
+    return 'Transaction failed: ' + revertReason;
   }
 
 }

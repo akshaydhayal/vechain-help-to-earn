@@ -5,7 +5,7 @@ import { useState } from 'react';
 interface AskQuestionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (title: string, description: string, bounty: string) => void;
+  onSubmit: (title: string, description: string, bounty: string, tags: string[]) => void;
   isTransactionPending: boolean;
   currentUser: string;
 }
@@ -20,14 +20,18 @@ export function AskQuestionModal({
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [bounty, setBounty] = useState('0.1');
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (title.trim() && description.trim() && bounty) {
-      onSubmit(title, description, bounty);
+      onSubmit(title, description, bounty, tags);
       setTitle('');
       setDescription('');
       setBounty('0.1');
+      setTags([]);
+      setTagInput('');
       onClose();
     }
   };
@@ -36,7 +40,27 @@ export function AskQuestionModal({
     setTitle('');
     setDescription('');
     setBounty('0.1');
+    setTags([]);
+    setTagInput('');
     onClose();
+  };
+
+  const addTag = () => {
+    if (tagInput.trim() && tags.length < 5 && !tags.includes(tagInput.trim())) {
+      setTags([...tags, tagInput.trim()]);
+      setTagInput('');
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleTagInputKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addTag();
+    }
   };
 
   if (!isOpen) return null;
@@ -116,6 +140,60 @@ export function AskQuestionModal({
               className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
               required
             />
+          </div>
+
+          {/* Tags */}
+          <div>
+            <label className="block text-xs font-medium text-gray-300 mb-1">
+              Tags (Optional)
+            </label>
+            <div className="space-y-2">
+              {/* Tag Input */}
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyPress={handleTagInputKeyPress}
+                  placeholder="Add a tag (max 5)"
+                  maxLength={20}
+                  className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={addTag}
+                  disabled={!tagInput.trim() || tags.length >= 5 || tags.includes(tagInput.trim())}
+                  className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                >
+                  Add
+                </button>
+              </div>
+              
+              {/* Tags Display */}
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2 py-1 bg-blue-900 text-blue-200 text-xs rounded-full"
+                    >
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() => removeTag(tag)}
+                        className="ml-1 text-blue-300 hover:text-blue-100"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              
+              <p className="text-xs text-gray-400">
+                Add up to 5 tags to help categorize your question. Press Enter or click Add.
+              </p>
+            </div>
           </div>
 
           {/* Bounty */}

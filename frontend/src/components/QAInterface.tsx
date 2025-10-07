@@ -17,6 +17,8 @@ interface Question {
   isActive: boolean;
   hasApprovedAnswer: boolean;
   approvedAnswerId: string;
+  upvotes: number;
+  tags: string[];
   timestamp: number;
 }
 
@@ -51,7 +53,7 @@ export function QAInterface() {
   const [isAskQuestionModalOpen, setIsAskQuestionModalOpen] = useState(false);
   
   // Toaster notifications
-  const { notifications, showTransactionSuccess, removeNotification } = useToaster();
+  const { notifications, showTransactionSuccess, showTransactionError, removeNotification } = useToaster();
 
   useEffect(() => {
     if (isConnected && account) {
@@ -89,7 +91,7 @@ export function QAInterface() {
   };
 
 
-  const handleAskQuestion = async (title: string, description: string, bounty: string) => {
+  const handleAskQuestion = async (title: string, description: string, bounty: string, tags: string[]) => {
     if (!title.trim() || !description.trim() || !bounty) {
       alert('Please enter a question title, description, and bounty amount');
       return;
@@ -108,7 +110,8 @@ export function QAInterface() {
       const txHash = await vechainSDKTransactionService.askQuestion(
         title,
         description,
-        bounty, 
+        bounty,
+        tags, // Use the tags from the form
         account || undefined
       );
       
@@ -128,6 +131,55 @@ export function QAInterface() {
     }
   };
 
+  const handleUpvoteQuestion = async (questionId: number) => {
+    console.log('🔥 handleUpvoteQuestion called with questionId:', questionId);
+    console.log('🔥 Account:', account);
+    
+    if (!account) {
+      console.log('❌ No account found, returning early');
+      return;
+    }
+
+    try {
+      setIsTransactionPending(true);
+      setError(null);
+      
+      console.log('🚀 Sending REAL VeChain testnet transaction for upvoteQuestion via VeChain SDK...');
+      console.log('Question ID:', questionId);
+      
+      const txHash = await vechainSDKTransactionService.upvoteQuestion(questionId, account);
+      showTransactionSuccess(txHash);
+      
+      // Optimistically update the upvote count immediately
+      setQuestions(prevQuestions => 
+        prevQuestions.map(q => 
+          q.id === questionId 
+            ? { ...q, upvotes: q.upvotes + 1 }
+            : q
+        )
+      );
+      
+      // Wait for transaction to be confirmed, then refresh data
+      setTimeout(async () => {
+        console.log('🔄 Reloading platform data after upvote...');
+        console.log('🔄 Current upvote count before refresh:', questions.find(q => q.id === questionId)?.upvotes);
+        await loadPlatformData();
+        console.log('🔄 Platform data reloaded');
+        
+        // Check if the upvote was actually recorded
+        const updatedQuestion = questions.find(q => q.id === questionId);
+        if (updatedQuestion) {
+          console.log('🔄 Final upvote count after refresh:', updatedQuestion.upvotes);
+        }
+      }, 15000); // Increased to 15 seconds to ensure transaction is mined
+      
+    } catch (err) {
+      console.error('Failed to upvote question:', err);
+      showTransactionError(err instanceof Error ? err.message : 'Failed to upvote question');
+    } finally {
+      setIsTransactionPending(false);
+    }
+  };
 
   if (!isConnected) {
     return (
@@ -168,6 +220,7 @@ export function QAInterface() {
         <QuestionList
           questions={questions}
           loading={loading}
+          onUpvoteQuestion={handleUpvoteQuestion}
         />
       </div>
 
@@ -198,7 +251,7 @@ export function QAInterface() {
           <div>
             <span className="font-medium text-gray-300">Contract Address:</span>
             <span className="ml-2 font-mono text-xs bg-gray-700 text-gray-200 px-2 py-1 rounded">
-              0x25d137e1d0bf7f135706803cd7722946e483aecf
+              0xf331dc138fdc90633c3176b2a9a80e9d2b13a8e2
             </span>
           </div>
         </div>

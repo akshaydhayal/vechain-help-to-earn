@@ -11,7 +11,7 @@ export class VeChainContractService {
   private abi: ABIContract<any>;
 
   constructor() {
-    this.contractAddress = '0x26dcef1017f34787f6fc86f47aa025b480c0911a';
+    this.contractAddress = '0xf331dc138fdc90633c3176b2a9a80e9d2b13a8e2';
     const testnetUrl = process.env.VECHAIN_TESTNET_URL || "https://testnet.vechain.org";
     this.thorClient = ThorClient.at(testnetUrl);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,24 +70,30 @@ export class VeChainContractService {
           title,
           description,
           bounty,
-          isActive,
           hasApprovedAnswer,
           approvedAnswerId,
+          upvotes,
+          tags,
           timestamp
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ] = result.result.plain as any[];
         
-        return {
+        const questionData = {
           id: Number(id),
           asker: asker,
           title: title,
           description: description,
           bounty: (Number(bounty) / 1e18).toFixed(2), // Convert from Wei to VET
-          isActive: isActive,
+          isActive: true, // All questions are active now (no isActive field in contract)
           hasApprovedAnswer: hasApprovedAnswer,
           approvedAnswerId: approvedAnswerId.toString(),
+          upvotes: Number(upvotes),
+          tags: tags || [], // Add tags field
           timestamp: Number(timestamp)
         };
+        
+        console.log(`📊 Fetched question ${questionId} from contract:`, questionData);
+        return questionData;
       }
       
       throw new Error(`Question ${questionId} not found`);
@@ -135,24 +141,30 @@ export class VeChainContractService {
               title,
               description,
               bounty,
-              isActive,
               hasApprovedAnswer,
               approvedAnswerId,
+              upvotes,
+              tags,
               timestamp
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ] = questionResult.result.plain as any[];
             
-            questions.push({
+            const questionData = {
               id: Number(id),
               asker: asker,
               title: title,
               description: description,
               bounty: (Number(bounty) / 1e18).toFixed(2), // Convert from Wei to VET
-              isActive: isActive,
+              isActive: true, // All questions are active now (no isActive field in contract)
               hasApprovedAnswer: hasApprovedAnswer,
               approvedAnswerId: approvedAnswerId.toString(),
+              upvotes: Number(upvotes),
+              tags: tags || [], // Add tags field
               timestamp: Number(timestamp)
-            });
+            };
+            
+            console.log(`📊 Fetched question ${i} from contract:`, questionData);
+            questions.push(questionData);
           }
         } catch (error) {
           console.error(`Error fetching question ${i}:`, error);

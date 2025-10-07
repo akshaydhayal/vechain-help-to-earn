@@ -32,6 +32,8 @@ contract SimpleQA {
         uint256 bounty; // VET bounty for best answer
         bool hasApprovedAnswer;
         uint256 approvedAnswerId;
+        uint256 upvotes; // Number of upvotes for the question
+        string[] tags; // Question tags (max 5)
         uint256 timestamp;
     }
     
@@ -60,6 +62,7 @@ contract SimpleQA {
     mapping(uint256 => Answer) public answers;
     mapping(address => User) public users;
     mapping(address => mapping(uint256 => bool)) public hasUpvoted; // user => answerId => hasUpvoted
+    mapping(address => mapping(uint256 => bool)) public hasUpvotedQuestion; // user => questionId => hasUpvoted
     
     // Counters
     uint256 public questionCounter;
@@ -82,6 +85,12 @@ contract SimpleQA {
     
     event AnswerUpvoted(
         uint256 indexed answerId,
+        address indexed upvoter,
+        uint256 newUpvoteCount
+    );
+    
+    event QuestionUpvoted(
+        uint256 indexed questionId,
         address indexed upvoter,
         uint256 newUpvoteCount
     );
@@ -144,11 +153,18 @@ contract SimpleQA {
     function askQuestion(
         string memory _title,
         string memory _description,
-        address _asker
+        address _asker,
+        string[] memory _tags
     ) external payable {
         require(bytes(_title).length > 0, "Title cannot be empty");
         require(bytes(_description).length > 0, "Description cannot be empty");
         require(_asker != address(0), "Asker address cannot be zero");
+        require(_tags.length <= 5, "Maximum 5 tags allowed");
+        
+        // Validate tags (no empty tags)
+        for (uint256 i = 0; i < _tags.length; i++) {
+            require(bytes(_tags[i]).length > 0, "Tag cannot be empty");
+        }
         
         // Register user if not already registered
         if (users[_asker].wallet == address(0)) {
@@ -172,6 +188,8 @@ contract SimpleQA {
             bounty: msg.value,
             hasApprovedAnswer: false,
             approvedAnswerId: 0,
+            upvotes: 0,
+            tags: _tags,
             timestamp: block.timestamp
         });
         
@@ -221,13 +239,12 @@ contract SimpleQA {
         emit AnswerSubmitted(answerCounter, _questionId, msg.sender, _content);
     }
     
-    // Upvote an answer
+    // Upvote an answer (one time per user)
     function upvoteAnswer(uint256 _answerId, address _voter) external answerExists(_answerId) {
-        // Removed restrictions: anyone can upvote any answer multiple times
-        // require(!hasUpvoted[msg.sender][_answerId], "Already upvoted this answer");
-        // require(answers[_answerId].answerer != msg.sender, "Cannot upvote your own answer");
-        
         require(_voter != address(0), "Voter address cannot be zero");
+        require(!hasUpvoted[_voter][_answerId], "Already upvoted this answer");
+        require(answers[_answerId].answerer != _voter, "Cannot upvote your own answer");
+        
         answers[_answerId].upvotes++;
         hasUpvoted[_voter][_answerId] = true;
         
@@ -244,6 +261,29 @@ contract SimpleQA {
         users[answers[_answerId].answerer].reputation += 1;
         
         emit AnswerUpvoted(_answerId, _voter, answers[_answerId].upvotes);
+    }
+    
+    // Upvote a question (one time per user)
+    function upvoteQuestion(uint256 _questionId, address _voter) external questionExists(_questionId) {
+        require(_voter != address(0), "Voter address cannot be zero");
+        require(!hasUpvotedQuestion[_voter][_questionId], "Already upvoted this question");
+        
+        questions[_questionId].upvotes++;
+        hasUpvotedQuestion[_voter][_questionId] = true;
+        
+        // Increase question asker's reputation
+        if (users[questions[_questionId].asker].wallet == address(0)) {
+            users[questions[_questionId].asker] = User({
+                wallet: questions[_questionId].asker,
+                reputation: 0,
+                questionsAsked: 0,
+                answersGiven: 0,
+                answersApproved: 0
+            });
+        }
+        users[questions[_questionId].asker].reputation += 1;
+        
+        emit QuestionUpvoted(_questionId, _voter, questions[_questionId].upvotes);
     }
     
     // Approve an answer (anyone can approve any answer)
@@ -330,6 +370,8 @@ contract SimpleQA {
         uint256 bounty,
         bool hasApprovedAnswer,
         uint256 approvedAnswerId,
+        uint256 upvotes,
+        string[] memory tags,
         uint256 timestamp
     ) {
         Question storage q = questions[_questionId];
@@ -341,6 +383,8 @@ contract SimpleQA {
             q.bounty,
             q.hasApprovedAnswer,
             q.approvedAnswerId,
+            q.upvotes,
+            q.tags,
             q.timestamp
         );
     }

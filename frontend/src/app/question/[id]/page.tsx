@@ -18,6 +18,8 @@ interface Question {
   isActive: boolean;
   hasApprovedAnswer: boolean;
   approvedAnswerId: string;
+  upvotes: number;
+  tags: string[];
   timestamp: number;
 }
 
@@ -107,7 +109,20 @@ export default function QuestionPage() {
       await loadQuestionData(); // Reload to get updated upvote count
     } catch (err: unknown) {
       console.error('Error upvoting answer:', err);
-      showTransactionError(err instanceof Error ? err.message : 'Failed to upvote answer');
+      
+      // Extract user-friendly error message
+      let errorMessage = 'Failed to upvote answer';
+      if (err instanceof Error) {
+        // Check if it's our custom error message
+        if (err.message.includes('Transaction was reverted')) {
+          errorMessage = 'Cannot upvote this answer. You may have already upvoted it or are trying to upvote your own answer.';
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
+      console.log('🚨 Showing error notification:', errorMessage);
+      showTransactionError(errorMessage);
     } finally {
       setIsTransactionPending(false);
     }
@@ -134,6 +149,39 @@ export default function QuestionPage() {
     } catch (err: unknown) {
       console.error('Error approving answer:', err);
       showTransactionError(err instanceof Error ? err.message : 'Failed to approve answer');
+    } finally {
+      setIsTransactionPending(false);
+    }
+  };
+
+  const handleUpvoteQuestion = async (questionId: number) => {
+    if (!account) return;
+
+    try {
+      setIsTransactionPending(true);
+      const txHash = await vechainSDKTransactionService.upvoteQuestion(questionId, account);
+      showTransactionSuccess(txHash);
+      
+      // Optimistically update the upvote count immediately
+      setQuestion(prevQuestion => 
+        prevQuestion ? { ...prevQuestion, upvotes: prevQuestion.upvotes + 1 } : prevQuestion
+      );
+      
+      // Wait for transaction to be confirmed, then refresh data
+      setTimeout(async () => {
+        console.log('🔄 Reloading question data after upvote...');
+        console.log('🔄 Current upvote count before refresh:', question?.upvotes);
+        await loadQuestionData();
+        console.log('🔄 Question data reloaded');
+        
+        // Check if the upvote was actually recorded
+        if (question) {
+          console.log('🔄 Final upvote count after refresh:', question.upvotes);
+        }
+      }, 15000); // Increased to 15 seconds to ensure transaction is mined
+    } catch (err: unknown) {
+      console.error('Error upvoting question:', err);
+      showTransactionError(err instanceof Error ? err.message : 'Failed to upvote question');
     } finally {
       setIsTransactionPending(false);
     }
@@ -191,17 +239,17 @@ export default function QuestionPage() {
           <div className="flex items-start p-4">
             {/* Voting Section */}
             <div className="flex flex-col items-center mr-4">
-              <button className="text-gray-400 hover:text-orange-400 transition-colors">
+              <button 
+                onClick={() => handleUpvoteQuestion(question.id)}
+                disabled={isTransactionPending}
+                className="text-gray-400 hover:text-orange-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Upvote this question"
+              >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                 </svg>
               </button>
-              <span className="text-sm font-semibold text-gray-300 my-1">0</span>
-              <button className="text-gray-400 hover:text-blue-400 transition-colors">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </button>
+              <span className="text-sm font-semibold text-gray-300 my-1">{question.upvotes}</span>
             </div>
 
             {/* Question Content */}
@@ -236,13 +284,24 @@ export default function QuestionPage() {
                 {question.description}
               </div>
 
-              {/* Question Flair */}
-              <div className="flex items-center mb-4">
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-600 text-white">
-                  Question
-                </span>
+              {/* Question Tags */}
+              <div className="flex items-center mb-4 flex-wrap gap-2">
+                {question.tags && question.tags.length > 0 ? (
+                  question.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-600 text-white"
+                    >
+                      {tag}
+                    </span>
+                  ))
+                ) : (
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-600 text-white">
+                    No tags
+                  </span>
+                )}
                 {question.hasApprovedAnswer && (
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-600 text-white ml-2">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-600 text-white">
                     <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                     </svg>

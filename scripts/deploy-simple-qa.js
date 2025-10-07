@@ -35,11 +35,12 @@ async function main() {
   await registerTx.wait();
   console.log("✅ User registration test passed");
   
-  // Ask a question with bounty
+  // Ask a question with bounty and tags
   const askQuestionTx = await simpleQA.askQuestion(
     "What is blockchain?",
     "Can someone explain blockchain technology in simple terms?",
     deployer.address, // Pass the deployer address as the asker
+    ["blockchain", "technology", "crypto"], // Question tags
     { value: ethers.parseEther("0.1") } // 0.1 VET bounty
   );
   await askQuestionTx.wait();
