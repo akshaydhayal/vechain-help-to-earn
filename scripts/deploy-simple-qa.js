@@ -39,6 +39,7 @@ async function main() {
   const askQuestionTx = await simpleQA.askQuestion(
     "What is blockchain?",
     "Can someone explain blockchain technology in simple terms?",
+    deployer.address, // Pass the deployer address as the asker
     { value: ethers.parseEther("0.1") } // 0.1 VET bounty
   );
   await askQuestionTx.wait();

@@ -118,6 +118,16 @@ export default function QuestionPage() {
 
     try {
       setIsTransactionPending(true);
+      
+      // Debug: Check if answer exists before approving
+      console.log('🔍 Attempting to approve answer ID:', answerId);
+      console.log('🔍 Available answers:', answers.map(a => ({ id: a.id, content: a.content.slice(0, 50) + '...' })));
+      console.log('🔍 Question details:', { 
+        asker: question?.asker, 
+        bounty: question?.bounty, 
+        hasApprovedAnswer: question?.hasApprovedAnswer 
+      });
+      
       const txHash = await vechainSDKTransactionService.approveAnswer(answerId, account);
       showTransactionSuccess(txHash);
       await loadQuestionData(); // Reload to get updated approval status
@@ -233,7 +243,10 @@ export default function QuestionPage() {
                 </span>
                 {question.hasApprovedAnswer && (
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-600 text-white ml-2">
-                    ✅ Resolved
+                    <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Resolved
                   </span>
                 )}
               </div>
@@ -333,9 +346,9 @@ export default function QuestionPage() {
           ) : (
             <div className="divide-y divide-gray-700">
               {answers.map((answer) => (
-                <div key={answer.id} className="p-4">
+                <div key={answer.id} className={`p-4 ${answer.isApproved ? 'bg-green-900/20 border-l-4 border-green-500' : ''}`}>
                   <div className="flex items-start space-x-3">
-                    {/* Answer Voting */}
+                    {/* Answer Voting - Left Side */}
                     <div className="flex flex-col items-center">
                       <button 
                         onClick={() => handleUpvoteAnswer(answer.id)}
@@ -346,16 +359,23 @@ export default function QuestionPage() {
                           <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                         </svg>
                       </button>
-                      <span className="text-xs font-semibold text-gray-300 my-1">{answer.upvotes}</span>
-                      <button className="text-gray-400 hover:text-blue-400 transition-colors">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
-                      </button>
+                      <span className="text-sm font-semibold text-gray-300 my-1">{answer.upvotes}</span>
                     </div>
 
-                    {/* Answer Content */}
+                    {/* Answer Content - Right Side */}
                     <div className="flex-1 min-w-0">
+                      {/* Approved Answer Banner */}
+                      {answer.isApproved && (
+                        <div className="mb-3 p-2 bg-green-600/20 border border-green-500/30 rounded-lg">
+                          <div className="flex items-center text-green-400 text-xs font-medium">
+                            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                            This answer has been approved by the question asker
+                          </div>
+                        </div>
+                      )}
+                      
                       {/* Answer Meta */}
                       <div className="flex items-center text-xs text-gray-400 mb-2">
                         <img 
@@ -371,7 +391,12 @@ export default function QuestionPage() {
                         {answer.isApproved && (
                           <>
                             <span className="mx-1">•</span>
-                            <span className="text-green-400 font-medium">✓ Approved</span>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-600 text-white">
+                              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                              Approved
+                            </span>
                           </>
                         )}
                       </div>
@@ -381,16 +406,53 @@ export default function QuestionPage() {
                         {answer.content}
                       </div>
 
+                      {/* Approve Button - Prominent Display */}
+                      {question.asker === account && !answer.isApproved && (
+                        <div className="mb-3 p-3 bg-green-600/10 border border-green-500/30 rounded-lg">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center text-green-400 text-sm">
+                              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                              This answer looks helpful? Approve it to mark the question as resolved.
+                            </div>
+                            <button
+                              onClick={() => handleApproveAnswer(answer.id)}
+                              disabled={isTransactionPending}
+                              className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                            >
+                              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                              {isTransactionPending ? 'Approving...' : 'Approve Answer'}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Answer Actions */}
                       <div className="flex items-center space-x-4 text-xs text-gray-400">
+                        <button className="hover:text-blue-400 transition-colors">Reply</button>
+                        <button className="hover:text-blue-400 transition-colors">Award</button>
+                        <button className="hover:text-blue-400 transition-colors">Share</button>
+                        <button className="hover:text-blue-400 transition-colors">⋯</button>
                         {question.asker === account && !answer.isApproved && (
                           <button
                             onClick={() => handleApproveAnswer(answer.id)}
                             disabled={isTransactionPending}
-                            className="hover:text-green-400 transition-colors disabled:opacity-50"
+                            className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                           >
+                            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
                             Approve Answer
                           </button>
+                        )}
+                        {/* Debug info - remove this later */}
+                        {process.env.NODE_ENV === 'development' && (
+                          <div className="text-xs text-gray-500">
+                            Debug: asker={question.asker?.slice(0,6)}, account={account?.slice(0,6)}, isApproved={answer.isApproved.toString()}
+                          </div>
                         )}
                       </div>
                     </div>

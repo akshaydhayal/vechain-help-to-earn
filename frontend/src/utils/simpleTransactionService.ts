@@ -9,7 +9,7 @@ export class VeChainSDKTransactionService {
   private provider: unknown;
 
   constructor() {
-    this.contractAddress = '0x25d137e1d0bf7f135706803cd7722946e483aecf'; // Updated contract address - no restrictions
+    this.contractAddress = '0x26dcef1017f34787f6fc86f47aa025b480c0911a'; // Updated contract address with user address parameters
     console.log('VeChain SDK transaction service initialized');
     this.initializeVeChainSDK();
   }
@@ -268,7 +268,8 @@ export class VeChainSDKTransactionService {
         name: 'askQuestion',
         inputs: [
           { name: '_title', type: 'string' },
-          { name: '_description', type: 'string' }
+          { name: '_description', type: 'string' },
+          { name: '_asker', type: 'address' }
         ],
         outputs: [],
         constant: false,
@@ -285,7 +286,7 @@ export class VeChainSDKTransactionService {
             Clause.callFunction(
               Address.of(this.contractAddress),
               askQuestionABI,
-              [title, description], // Using separate title and description
+              [title, description, userAddress], // Using separate title, description, and asker address
               bountyVET
             )
           ];
@@ -370,7 +371,8 @@ export class VeChainSDKTransactionService {
         name: 'submitAnswer',
         inputs: [
           { name: '_questionId', type: 'uint256' },
-          { name: '_content', type: 'string' }
+          { name: '_content', type: 'string' },
+          { name: '_answerer', type: 'address' }
         ],
         outputs: [],
         constant: false,
@@ -384,7 +386,7 @@ export class VeChainSDKTransactionService {
         Clause.callFunction(
           Address.of(this.contractAddress),
           submitAnswerABI,
-          [questionId, content],
+          [questionId, content, userAddress],
           VET.of(0) // No VET transfer for answers
         )
       ];
@@ -478,7 +480,8 @@ export class VeChainSDKTransactionService {
       const upvoteAnswerABI = new ABIFunction({
         name: 'upvoteAnswer',
         inputs: [
-          { name: '_answerId', type: 'uint256' }
+          { name: '_answerId', type: 'uint256' },
+          { name: '_voter', type: 'address' }
         ],
         outputs: [],
         constant: false,
@@ -492,7 +495,7 @@ export class VeChainSDKTransactionService {
         Clause.callFunction(
           Address.of(this.contractAddress),
           upvoteAnswerABI,
-          [answerId], // Only answerId, not questionId
+          [answerId, userAddress], // answerId and voter address
           VET.of(0) // No VET transfer for upvotes
         )
       ];
@@ -576,7 +579,8 @@ export class VeChainSDKTransactionService {
       const approveAnswerABI = new ABIFunction({
         name: 'approveAnswer',
         inputs: [
-          { name: '_answerId', type: 'uint256' }
+          { name: '_answerId', type: 'uint256' },
+          { name: '_approver', type: 'address' }
         ],
         outputs: [],
         constant: false,
@@ -590,7 +594,7 @@ export class VeChainSDKTransactionService {
         Clause.callFunction(
           Address.of(this.contractAddress),
           approveAnswerABI,
-          [answerId], // Only answerId, not questionId
+          [answerId, userAddress], // answerId and approver address
           VET.of(0) // No VET transfer for approvals
         )
       ];

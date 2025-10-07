@@ -30,7 +30,6 @@ contract SimpleQA {
         string title;
         string description;
         uint256 bounty; // VET bounty for best answer
-        bool isActive;
         bool hasApprovedAnswer;
         uint256 approvedAnswerId;
         uint256 timestamp;
@@ -144,38 +143,39 @@ contract SimpleQA {
     // Ask a question with optional bounty
     function askQuestion(
         string memory _title,
-        string memory _description
+        string memory _description,
+        address _asker
     ) external payable {
         require(bytes(_title).length > 0, "Title cannot be empty");
         require(bytes(_description).length > 0, "Description cannot be empty");
+        require(_asker != address(0), "Asker address cannot be zero");
         
         // Register user if not already registered
-        if (users[msg.sender].wallet == address(0)) {
-            users[msg.sender] = User({
-                wallet: msg.sender,
+        if (users[_asker].wallet == address(0)) {
+            users[_asker] = User({
+                wallet: _asker,
                 reputation: 0,
                 questionsAsked: 0,
                 answersGiven: 0,
                 answersApproved: 0
             });
-            emit UserRegistered(msg.sender);
+            emit UserRegistered(_asker);
         }
         
         questionCounter++;
         
         questions[questionCounter] = Question({
             id: questionCounter,
-            asker: msg.sender,
+            asker: _asker,
             title: _title,
             description: _description,
             bounty: msg.value,
-            isActive: true,
             hasApprovedAnswer: false,
             approvedAnswerId: 0,
             timestamp: block.timestamp
         });
         
-        users[msg.sender].questionsAsked++;
+        users[_asker].questionsAsked++;
         
         emit QuestionAsked(questionCounter, msg.sender, _title, msg.value);
     }
@@ -183,23 +183,25 @@ contract SimpleQA {
     // Submit an answer to a question
     function submitAnswer(
         uint256 _questionId,
-        string memory _content
+        string memory _content,
+        address _answerer
     ) external questionExists(_questionId) {
         require(bytes(_content).length > 0, "Answer content cannot be empty");
+        require(_answerer != address(0), "Answerer address cannot be zero");
         // Removed restrictions: anyone can answer any question
         // require(questions[_questionId].isActive, "Question is not active");
         // require(questions[_questionId].asker != msg.sender, "Cannot answer your own question");
         
         // Register user if not already registered
-        if (users[msg.sender].wallet == address(0)) {
-            users[msg.sender] = User({
-                wallet: msg.sender,
+        if (users[_answerer].wallet == address(0)) {
+            users[_answerer] = User({
+                wallet: _answerer,
                 reputation: 0,
                 questionsAsked: 0,
                 answersGiven: 0,
                 answersApproved: 0
             });
-            emit UserRegistered(msg.sender);
+            emit UserRegistered(_answerer);
         }
         
         answerCounter++;
@@ -207,57 +209,76 @@ contract SimpleQA {
         answers[answerCounter] = Answer({
             id: answerCounter,
             questionId: _questionId,
-            answerer: msg.sender,
+            answerer: _answerer,
             content: _content,
             upvotes: 0,
             isApproved: false,
             timestamp: block.timestamp
         });
         
-        users[msg.sender].answersGiven++;
+        users[_answerer].answersGiven++;
         
         emit AnswerSubmitted(answerCounter, _questionId, msg.sender, _content);
     }
     
     // Upvote an answer
-    function upvoteAnswer(uint256 _answerId) external answerExists(_answerId) {
+    function upvoteAnswer(uint256 _answerId, address _voter) external answerExists(_answerId) {
         // Removed restrictions: anyone can upvote any answer multiple times
         // require(!hasUpvoted[msg.sender][_answerId], "Already upvoted this answer");
         // require(answers[_answerId].answerer != msg.sender, "Cannot upvote your own answer");
         
+        require(_voter != address(0), "Voter address cannot be zero");
         answers[_answerId].upvotes++;
-        hasUpvoted[msg.sender][_answerId] = true;
+        hasUpvoted[_voter][_answerId] = true;
         
-        // Increase answerer's reputation
+        // Increase answerer's reputation (ensure user exists first)
+        if (users[answers[_answerId].answerer].wallet == address(0)) {
+            users[answers[_answerId].answerer] = User({
+                wallet: answers[_answerId].answerer,
+                reputation: 0,
+                questionsAsked: 0,
+                answersGiven: 0,
+                answersApproved: 0
+            });
+        }
         users[answers[_answerId].answerer].reputation += 1;
         
-        emit AnswerUpvoted(_answerId, msg.sender, answers[_answerId].upvotes);
+        emit AnswerUpvoted(_answerId, _voter, answers[_answerId].upvotes);
     }
     
     // Approve an answer (anyone can approve any answer)
-    function approveAnswer(uint256 _answerId) external answerExists(_answerId) {
+    function approveAnswer(uint256 _answerId, address _approver) external answerExists(_answerId) {
         uint256 questionId = answers[_answerId].questionId;
-        // Removed restrictions: anyone can approve any answer
-        // require(questions[questionId].asker == msg.sender, "Only question asker can approve answers");
-        // require(!questions[questionId].hasApprovedAnswer, "Question already has an approved answer");
-        // require(questions[questionId].isActive, "Question is not active");
+        // Approval restrictions (only question asker, only one approval per question)
+        require(_approver != address(0), "Approver address cannot be zero");
+        require(questions[questionId].asker == _approver, "Only question asker can approve answers");
+        require(!questions[questionId].hasApprovedAnswer, "Question already has an approved answer");
         
         // Mark answer as approved
         answers[_answerId].isApproved = true;
         questions[questionId].hasApprovedAnswer = true;
         questions[questionId].approvedAnswerId = _answerId;
-        questions[questionId].isActive = false; // Close the question
+        // Question remains open for more answers (no isActive field needed)
         
-        // Update user stats
+        // Update user stats (ensure user exists first)
+        if (users[answers[_answerId].answerer].wallet == address(0)) {
+            users[answers[_answerId].answerer] = User({
+                wallet: answers[_answerId].answerer,
+                reputation: 0,
+                questionsAsked: 0,
+                answersGiven: 0,
+                answersApproved: 0
+            });
+        }
         users[answers[_answerId].answerer].answersApproved++;
         users[answers[_answerId].answerer].reputation += 10; // Bonus reputation for approved answer
         
-        // Distribute rewards if bounty exists
-        if (questions[questionId].bounty > 0) {
+        // Distribute rewards if bounty exists and contract has sufficient balance
+        if (questions[questionId].bounty > 0 && address(this).balance >= questions[questionId].bounty) {
             _distributeReward(answers[_answerId].answerer, questions[questionId].bounty);
         }
         
-        // Distribute VeBetterDAO rewards
+        // Distribute VeBetterDAO rewards (only if conditions are met)
         _distributeVeBetterReward(answers[_answerId].answerer);
         
         emit AnswerApproved(_answerId, questionId, answers[_answerId].answerer, questions[questionId].bounty);
@@ -307,7 +328,6 @@ contract SimpleQA {
         string memory title,
         string memory description,
         uint256 bounty,
-        bool isActive,
         bool hasApprovedAnswer,
         uint256 approvedAnswerId,
         uint256 timestamp
@@ -319,7 +339,6 @@ contract SimpleQA {
             q.title,
             q.description,
             q.bounty,
-            q.isActive,
             q.hasApprovedAnswer,
             q.approvedAnswerId,
             q.timestamp
