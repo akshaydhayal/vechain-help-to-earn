@@ -89,7 +89,8 @@ export class VeChainContractService {
           approvedAnswerId: approvedAnswerId.toString(),
           upvotes: Number(upvotes),
           tags: tags || [], // Add tags field
-          timestamp: Number(timestamp)
+          timestamp: Number(timestamp),
+          replies: 2 // TODO: Implement actual replies count from contract
         };
         
         console.log(`📊 Fetched question ${questionId} from contract:`, questionData);
@@ -160,7 +161,8 @@ export class VeChainContractService {
               approvedAnswerId: approvedAnswerId.toString(),
               upvotes: Number(upvotes),
               tags: tags || [], // Add tags field
-              timestamp: Number(timestamp)
+              timestamp: Number(timestamp),
+              replies: 2 // TODO: Implement actual replies count from contract
             };
             
             console.log(`📊 Fetched question ${i} from contract:`, questionData);

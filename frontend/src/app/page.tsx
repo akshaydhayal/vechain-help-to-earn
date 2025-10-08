@@ -8,41 +8,49 @@ export default function Home() {
   const { isConnected } = useWallet();
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-black relative overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
       {/* Common Navbar */}
       <Navbar />
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 relative z-10">
         {!isConnected ? (
           <div className="text-center py-6">
-            <h2 className="text-2xl font-bold text-white mb-3">
+            <h2 className="text-2xl font-bold text-cyan-300 mb-3 font-mono">
               Welcome to VeChain Quora
             </h2>
-            <p className="text-base text-gray-300 mb-6">
+            <p className="text-base text-cyan-400 mb-6 font-mono">
               Connect your VeWorld wallet to start asking questions, answering, and earning B3TR rewards
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-              <div className="text-center p-4 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
-                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="text-center p-4 bg-black border-2 border-cyan-400 rounded-lg shadow-2xl hover:border-cyan-300 hover:shadow-cyan-400/50 transition-all duration-300 relative overflow-hidden">
+                {/* Animated background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+                <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center mx-auto mb-3 border border-cyan-400 relative z-10">
                   <span className="text-xl">❓</span>
                 </div>
-                <h3 className="text-base font-semibold mb-2 text-white">Ask Questions</h3>
-                <p className="text-sm text-gray-300">Post questions with VET bounties and get quality answers from the community.</p>
+                <h3 className="text-base font-semibold mb-2 text-cyan-300 font-mono relative z-10">Ask Questions</h3>
+                <p className="text-sm text-gray-300 font-mono relative z-10">Post questions with VET bounties and get quality answers from the community.</p>
               </div>
-              <div className="text-center p-4 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
-                <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="text-center p-4 bg-black border-2 border-cyan-400 rounded-lg shadow-2xl hover:border-cyan-300 hover:shadow-cyan-400/50 transition-all duration-300 relative overflow-hidden">
+                {/* Animated background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+                <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3 border border-green-400 relative z-10">
                   <span className="text-xl">💬</span>
                 </div>
-                <h3 className="text-base font-semibold mb-2 text-white">Answer & Earn</h3>
-                <p className="text-sm text-gray-300">Provide helpful answers and earn B3TR tokens through VeBetter DAO rewards.</p>
+                <h3 className="text-base font-semibold mb-2 text-cyan-300 font-mono relative z-10">Answer & Earn</h3>
+                <p className="text-sm text-gray-300 font-mono relative z-10">Provide helpful answers and earn B3TR tokens through VeBetter DAO rewards.</p>
               </div>
-              <div className="text-center p-4 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
-                <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="text-center p-4 bg-black border-2 border-cyan-400 rounded-lg shadow-2xl hover:border-cyan-300 hover:shadow-cyan-400/50 transition-all duration-300 relative overflow-hidden">
+                {/* Animated background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+                <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-3 border border-purple-400 relative z-10">
                   <span className="text-xl">⭐</span>
                 </div>
-                <h3 className="text-base font-semibold mb-2 text-white">Build Reputation</h3>
-                <p className="text-sm text-gray-300">Gain reputation points and recognition for quality contributions to the community.</p>
+                <h3 className="text-base font-semibold mb-2 text-cyan-300 font-mono relative z-10">Build Reputation</h3>
+                <p className="text-sm text-gray-300 font-mono relative z-10">Gain reputation points and recognition for quality contributions to the community.</p>
               </div>
             </div>
           </div>

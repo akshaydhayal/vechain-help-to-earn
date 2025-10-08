@@ -233,145 +233,125 @@ export default function QuestionPage() {
       
       {/* Main Content - Reddit-style layout */}
       <main className="max-w-4xl mx-auto px-4 py-6">
-        {/* Question Post - Reddit-style */}
-        <div className="bg-gray-800 rounded-lg border border-gray-700 mb-4">
+        {/* Question Post - Neon Cyberpunk style */}
+        <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-4 relative overflow-hidden mb-4">
+          {/* Animated background */}
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
           {/* Question Header */}
-          <div className="flex items-start p-4">
+          <div className="flex items-start relative z-10">
             {/* Voting Section */}
             <div className="flex flex-col items-center mr-4">
               <button 
                 onClick={() => handleUpvoteQuestion(question.id)}
                 disabled={isTransactionPending}
-                className="text-gray-400 hover:text-orange-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center px-2 py-1 bg-cyan-500 text-black rounded border border-cyan-400 hover:bg-cyan-400 transition-all duration-200 font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Upvote this question"
               >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.834a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
                 </svg>
+                {question.upvotes}
               </button>
-              <span className="text-sm font-semibold text-gray-300 my-1">{question.upvotes}</span>
             </div>
 
             {/* Question Content */}
             <div className="flex-1">
-              {/* Question Meta */}
-              <div className="flex items-center text-xs text-gray-400 mb-2">
-                <img 
-                  src={getAvatarForAddress(question.asker, 20)} 
-                  alt="User avatar" 
-                  className="w-5 h-5 rounded-full mr-2"
-                />
-                <span className="font-medium text-white hover:underline cursor-pointer">
-                  {question.asker.slice(0, 6)}...{question.asker.slice(-4)}
-                </span>
-                <span className="mx-1">•</span>
-                <span>{formatTimeAgo(question.timestamp)}</span>
-                {question.bounty && parseFloat(question.bounty) > 0 && (
-                  <>
-                    <span className="mx-1">•</span>
-                    <span className="text-green-400 font-semibold">💰 {question.bounty} VET bounty</span>
-                  </>
-                )}
-              </div>
-
               {/* Question Title */}
-              <h1 className="text-xl font-semibold text-white mb-3 leading-tight">
+              <h1 className="text-2xl font-bold text-cyan-300 mb-3 font-mono">
                 {question.title}
               </h1>
 
               {/* Question Description */}
-              <div className="text-gray-300 text-sm leading-relaxed mb-4">
+              <div className="text-gray-300 text-base leading-relaxed mb-4 font-mono">
                 {question.description}
               </div>
 
               {/* Question Tags */}
-              <div className="flex items-center mb-4 flex-wrap gap-2">
+              <div className="flex items-center mb-3 flex-wrap gap-1">
                 {question.tags && question.tags.length > 0 ? (
                   question.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-600 text-white"
+                      className="px-2 py-1 bg-purple-500 text-white text-xs font-mono rounded border border-purple-400"
                     >
                       {tag}
                     </span>
                   ))
                 ) : (
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-600 text-white">
+                  <span className="px-2 py-1 bg-gray-700 text-gray-300 text-xs font-mono rounded border border-gray-600">
                     No tags
                   </span>
                 )}
                 {question.hasApprovedAnswer && (
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-600 text-white">
-                    <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    Resolved
+                  <span className="px-2 py-1 bg-green-500 text-black text-xs font-bold rounded border border-green-400">
+                    ✅ RESOLVED
                   </span>
                 )}
               </div>
 
-              {/* Engagement Bar */}
-              <div className="flex items-center space-x-6 text-xs text-gray-400">
-                <button className="flex items-center space-x-1 hover:text-blue-400 transition-colors">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clipRule="evenodd" />
-                  </svg>
-                  <span>{answers.length} Answers</span>
-                </button>
-                <button className="flex items-center space-x-1 hover:text-blue-400 transition-colors">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
-                  </svg>
-                  <span>Share</span>
-                </button>
-                <button className="flex items-center space-x-1 hover:text-blue-400 transition-colors">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
-                  </svg>
-                  <span>Save</span>
-                </button>
+              {/* Question Meta */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center text-sm">
+                    <img 
+                      src={getAvatarForAddress(question.asker, 16)} 
+                      alt="User avatar" 
+                      className="w-5 h-5 rounded-full border border-cyan-400 mr-2"
+                    />
+                    <span className="text-cyan-300 font-mono">
+                      {question.asker.slice(0, 6)}...{question.asker.slice(-4)} • {formatTimeAgo(question.timestamp)}
+                    </span>
+                  </div>
+                </div>
+                
+                {question.bounty && parseFloat(question.bounty) > 0 && (
+                  <div className="bg-green-500 text-black px-2 py-1 rounded border border-green-400 font-bold text-xs">
+                    💰 {question.bounty} VET
+                  </div>
+                )}
               </div>
+
             </div>
           </div>
         </div>
 
-        {/* Answer Form - Compact Design */}
+        {/* Answer Form - Neon Cyberpunk style */}
         {isConnected && (
-          <div className="bg-gray-800 rounded-lg border border-gray-700 mb-4">
-            <div className="p-3">
-              <div className="flex-1">
-                <div className="bg-gray-700 border border-gray-600 rounded-lg p-3">
-                  <textarea
-                    value={answerContent}
-                    onChange={(e) => {
-                      setAnswerContent(e.target.value);
-                      // Auto-resize textarea
-                      const textarea = e.target;
-                      textarea.style.height = 'auto';
-                      textarea.style.height = Math.max(textarea.scrollHeight, 1 * 20) + 'px'; // 1 line minimum (20px per line)
-                    }}
-                    placeholder="Write your answer here..."
-                    rows={1}
-                    style={{ minHeight: '20px' }}
-                    className="w-full px-0 py-0 bg-transparent border-0 text-white focus:outline-none resize-none text-sm"
+          <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-4 relative overflow-hidden mb-4">
+            {/* Animated background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+            <div className="flex-1 relative z-10">
+              <div className="bg-gray-900 border border-cyan-400 rounded-lg p-3">
+                <textarea
+                  value={answerContent}
+                  onChange={(e) => {
+                    setAnswerContent(e.target.value);
+                    // Auto-resize textarea
+                    const textarea = e.target;
+                    textarea.style.height = 'auto';
+                    textarea.style.height = Math.max(textarea.scrollHeight, 1 * 20) + 'px'; // 1 line minimum (20px per line)
+                  }}
+                  placeholder="Write your answer here..."
+                  rows={1}
+                  style={{ minHeight: '20px' }}
+                  className="w-full px-0 py-0 bg-transparent border-0 text-cyan-300 focus:outline-none resize-none text-sm font-mono"
+                />
+                <div className="flex items-center justify-end space-x-2 mt-2 pt-2 border-t border-cyan-400">
+                  <img 
+                    src={getAvatarForAddress(account || '', 16)} 
+                    alt="Your avatar" 
+                    className="w-4 h-4 rounded-full flex-shrink-0 border border-cyan-400"
                   />
-                  <div className="flex items-center justify-end space-x-2 mt-2 pt-2 border-t border-gray-600">
-                    <img 
-                      src={getAvatarForAddress(account || '', 16)} 
-                      alt="Your avatar" 
-                      className="w-4 h-4 rounded-full flex-shrink-0"
-                    />
-                    <span className="text-xs text-gray-400">
-                      Answer as <span className="font-medium text-white">{account?.slice(0, 6)}...{account?.slice(-4)}</span>
-                    </span>
-                    <button
-                      onClick={handleSubmitAnswer}
-                      disabled={!answerContent.trim() || isTransactionPending}
-                      className="bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs font-medium"
-                    >
-                      {isTransactionPending ? 'Submitting...' : 'Answer'}
-                    </button>
-                  </div>
+                  <span className="text-xs text-cyan-300 font-mono">
+                    Answer as <span className="font-bold">{account?.slice(0, 6)}...{account?.slice(-4)}</span>
+                  </span>
+                  <button
+                    onClick={handleSubmitAnswer}
+                    disabled={!answerContent.trim() || isTransactionPending}
+                    className="bg-cyan-500 text-black px-3 py-1 rounded border border-cyan-400 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs font-bold"
+                  >
+                    {isTransactionPending ? 'Submitting...' : 'Answer'}
+                  </button>
                 </div>
               </div>
             </div>
@@ -379,15 +359,17 @@ export default function QuestionPage() {
         )}
 
         {/* Answers Section */}
-        <div className="bg-gray-800 rounded-lg border border-gray-700">
-          <div className="p-4 border-b border-gray-700">
+        <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 relative overflow-hidden">
+          {/* Animated background */}
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+          <div className="p-4 border-b border-cyan-400 relative z-10">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-white">
+              <h3 className="text-sm font-semibold text-cyan-300 font-mono">
                 {answers.length} {answers.length === 1 ? 'Answer' : 'Answers'}
               </h3>
-              <div className="flex items-center space-x-2 text-xs text-gray-400">
-                <span>Sort by:</span>
-                <select className="bg-gray-700 border border-gray-600 text-white rounded px-2 py-1">
+              <div className="flex items-center space-x-2 text-xs text-cyan-300">
+                <span className="font-mono">Sort by:</span>
+                <select className="bg-gray-900 border border-cyan-400 text-cyan-300 rounded px-2 py-1 font-mono">
                   <option>Best</option>
                   <option>Top</option>
                   <option>New</option>
@@ -398,27 +380,28 @@ export default function QuestionPage() {
           </div>
           
           {answers.length === 0 ? (
-            <div className="text-center py-8">
+            <div className="text-center py-8 relative z-10">
               <div className="text-4xl mb-3">💭</div>
-              <p className="text-gray-400 text-sm">No answers yet. Be the first to share your thoughts!</p>
+              <p className="text-cyan-300 text-sm font-mono">No answers yet. Be the first to share your thoughts!</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-700">
+            <div className="divide-y divide-cyan-400 relative z-10">
               {answers.map((answer) => (
-                <div key={answer.id} className={`p-4 ${answer.isApproved ? 'bg-green-900/20 border-l-4 border-green-500' : ''}`}>
+                <div key={answer.id} className={`p-4 relative z-10 ${answer.isApproved ? 'bg-green-900/20 border-l-4 border-green-500' : ''}`}>
                   <div className="flex items-start space-x-3">
                     {/* Answer Voting - Left Side */}
                     <div className="flex flex-col items-center">
                       <button 
                         onClick={() => handleUpvoteAnswer(answer.id)}
                         disabled={isTransactionPending}
-                        className="text-gray-400 hover:text-orange-400 transition-colors disabled:opacity-50"
+                        className="flex items-center px-2 py-1 bg-cyan-500 text-black rounded border border-cyan-400 hover:bg-cyan-400 transition-all duration-200 font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Upvote this answer"
                       >
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                        <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.834a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
                         </svg>
+                        {answer.upvotes}
                       </button>
-                      <span className="text-sm font-semibold text-gray-300 my-1">{answer.upvotes}</span>
                     </div>
 
                     {/* Answer Content - Right Side */}
@@ -436,21 +419,21 @@ export default function QuestionPage() {
                       )}
                       
                       {/* Answer Meta */}
-                      <div className="flex items-center text-xs text-gray-400 mb-2">
+                      <div className="flex items-center text-xs text-slate-400 mb-2">
                         <img 
                           src={getAvatarForAddress(answer.answerer, 20)} 
                           alt="User avatar" 
-                          className="w-5 h-5 rounded-full mr-2"
+                          className="w-5 h-5 rounded-full mr-2 ring-1 ring-slate-600/50"
                         />
-                        <span className="font-medium text-white hover:underline cursor-pointer">
+                        <span className="font-medium text-cyan-300 hover:underline cursor-pointer">
                           {answer.answerer.slice(0, 6)}...{answer.answerer.slice(-4)}
                         </span>
                         <span className="mx-1">•</span>
-                        <span>{formatTimeAgo(answer.timestamp)}</span>
+                        <span className="text-purple-300">{formatTimeAgo(answer.timestamp)}</span>
                         {answer.isApproved && (
                           <>
                             <span className="mx-1">•</span>
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-600 text-white">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-600/20 text-green-400 border border-green-500/30">
                               <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
@@ -461,7 +444,7 @@ export default function QuestionPage() {
                       </div>
 
                       {/* Answer Text */}
-                      <div className="text-gray-300 text-sm leading-relaxed mb-3">
+                      <div className="text-gray-300 text-sm leading-relaxed mb-3 font-mono">
                         {answer.content}
                       </div>
 
@@ -490,11 +473,11 @@ export default function QuestionPage() {
                       )}
 
                       {/* Answer Actions */}
-                      <div className="flex items-center space-x-4 text-xs text-gray-400">
-                        <button className="hover:text-blue-400 transition-colors">Reply</button>
-                        <button className="hover:text-blue-400 transition-colors">Award</button>
-                        <button className="hover:text-blue-400 transition-colors">Share</button>
-                        <button className="hover:text-blue-400 transition-colors">⋯</button>
+                      <div className="flex items-center space-x-4 text-xs text-cyan-300 font-mono">
+                        <button className="hover:text-cyan-200 transition-colors">Reply</button>
+                        <button className="hover:text-cyan-200 transition-colors">Award</button>
+                        <button className="hover:text-cyan-200 transition-colors">Share</button>
+                        <button className="hover:text-cyan-200 transition-colors">⋯</button>
                         {question.asker === account && !answer.isApproved && (
                           <button
                             onClick={() => handleApproveAnswer(answer.id)}

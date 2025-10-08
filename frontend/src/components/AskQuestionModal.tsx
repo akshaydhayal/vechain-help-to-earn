@@ -67,21 +67,23 @@ export function AskQuestionModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-xl shadow-2xl max-w-xl w-full max-h-[85vh] overflow-hidden border border-gray-600">
+      <div className="bg-black border-2 border-cyan-400 rounded-xl shadow-2xl max-w-xl w-full max-h-[85vh] overflow-hidden relative">
+        {/* Animated background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-600">
+        <div className="flex items-center justify-between p-4 border-b border-cyan-400 relative z-10">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-semibold text-base">?</span>
+            <div className="w-8 h-8 bg-cyan-500 rounded-full flex items-center justify-center border border-cyan-400">
+              <span className="text-black font-semibold text-base font-mono">?</span>
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">Ask a Question</h2>
-              <p className="text-xs text-gray-300">Share your question with the community</p>
+              <h2 className="text-lg font-bold text-cyan-300 font-mono">Ask a Question</h2>
+              <p className="text-xs text-cyan-400 font-mono">Share your question with the community</p>
             </div>
           </div>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-200 transition-colors"
+            className="text-cyan-400 hover:text-cyan-200 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -90,23 +92,23 @@ export function AskQuestionModal({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+        <form onSubmit={handleSubmit} className="p-4 space-y-4 relative z-10">
           {/* User Info */}
-          <div className="flex items-center space-x-2 p-2 bg-gray-700 rounded-lg">
-            <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-semibold text-xs">
+          <div className="flex items-center space-x-2 p-2 bg-gray-900 rounded-lg border border-cyan-400">
+            <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center border border-purple-400">
+              <span className="text-white font-semibold text-xs font-mono">
                 {currentUser ? currentUser.slice(2, 4).toUpperCase() : 'A'}
               </span>
             </div>
             <div className="flex-1">
-              <p className="text-xs font-medium text-white">
+              <p className="text-xs font-medium text-cyan-300 font-mono">
                 {currentUser ? `${currentUser.slice(0, 6)}...${currentUser.slice(-4)}` : 'Anonymous'}
               </p>
-              <p className="text-xs text-gray-300">VeChain User</p>
+              <p className="text-xs text-cyan-400 font-mono">VeChain User</p>
             </div>
             <div className="flex items-center space-x-1">
-              <span className="text-xs text-gray-300">Visibility:</span>
-              <span className="px-1.5 py-0.5 bg-green-900 text-green-200 text-xs font-medium rounded-full">
+              <span className="text-xs text-cyan-300 font-mono">Visibility:</span>
+              <span className="px-1.5 py-0.5 bg-green-500 text-black text-xs font-medium rounded-full border border-green-400">
                 Public
               </span>
             </div>
@@ -114,7 +116,7 @@ export function AskQuestionModal({
 
           {/* Question Title */}
           <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">
+            <label className="block text-xs font-medium text-cyan-300 mb-1 font-mono">
               Question Title *
             </label>
             <input
@@ -122,14 +124,14 @@ export function AskQuestionModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="What's your question?"
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              className="w-full px-3 py-2 bg-gray-900 border border-cyan-400 text-cyan-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-sm font-mono"
               required
             />
           </div>
 
           {/* Question Description */}
           <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">
+            <label className="block text-xs font-medium text-cyan-300 mb-1 font-mono">
               Question Description *
             </label>
             <textarea
@@ -137,14 +139,14 @@ export function AskQuestionModal({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Provide more details about your question..."
               rows={3}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
+              className="w-full px-3 py-2 bg-gray-900 border border-cyan-400 text-cyan-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none text-sm font-mono"
               required
             />
           </div>
 
           {/* Tags */}
           <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">
+            <label className="block text-xs font-medium text-cyan-300 mb-1 font-mono">
               Tags (Optional)
             </label>
             <div className="space-y-2">
@@ -157,13 +159,13 @@ export function AskQuestionModal({
                   onKeyPress={handleTagInputKeyPress}
                   placeholder="Add a tag (max 5)"
                   maxLength={20}
-                  className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="flex-1 px-3 py-2 bg-gray-900 border border-cyan-400 text-cyan-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-sm font-mono"
                 />
                 <button
                   type="button"
                   onClick={addTag}
                   disabled={!tagInput.trim() || tags.length >= 5 || tags.includes(tagInput.trim())}
-                  className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+                  className="px-3 py-2 bg-cyan-500 text-black rounded border border-cyan-400 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-bold"
                 >
                   Add
                 </button>
@@ -175,13 +177,13 @@ export function AskQuestionModal({
                   {tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center px-2 py-1 bg-blue-900 text-blue-200 text-xs rounded-full"
+                      className="inline-flex items-center px-2 py-1 bg-purple-500 text-white text-xs rounded border border-purple-400 font-mono"
                     >
                       {tag}
                       <button
                         type="button"
                         onClick={() => removeTag(tag)}
-                        className="ml-1 text-blue-300 hover:text-blue-100"
+                        className="ml-1 text-white hover:text-gray-300"
                       >
                         ×
                       </button>
@@ -190,7 +192,7 @@ export function AskQuestionModal({
                 </div>
               )}
               
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-cyan-400 font-mono">
                 Add up to 5 tags to help categorize your question. Press Enter or click Add.
               </p>
             </div>
@@ -198,7 +200,7 @@ export function AskQuestionModal({
 
           {/* Bounty */}
           <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">
+            <label className="block text-xs font-medium text-cyan-300 mb-1 font-mono">
               Bounty Amount (VET) *
             </label>
             <div className="relative">
@@ -209,31 +211,31 @@ export function AskQuestionModal({
                 placeholder="0.1"
                 min="0.01"
                 step="0.01"
-                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="w-full px-3 py-2 bg-gray-900 border border-cyan-400 text-cyan-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-sm font-mono"
                 required
               />
               <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                <span className="text-gray-400 text-xs">VET</span>
+                <span className="text-cyan-400 text-xs font-mono">VET</span>
               </div>
             </div>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-cyan-400 mt-1 font-mono">
               Minimum 0.01 VET. Higher bounties attract more attention.
             </p>
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end space-x-2 pt-3 border-t border-gray-600">
+          <div className="flex justify-end space-x-2 pt-3 border-t border-cyan-400">
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 text-gray-400 hover:text-gray-200 transition-colors text-sm"
+              className="px-4 py-2 text-cyan-400 hover:text-cyan-200 transition-colors text-sm font-mono"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!title.trim() || !description.trim() || !bounty || isTransactionPending}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
+              className="px-4 py-2 bg-cyan-500 text-black rounded border border-cyan-400 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-bold"
             >
               {isTransactionPending ? 'Submitting...' : 'Ask Question'}
             </button>

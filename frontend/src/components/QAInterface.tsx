@@ -5,6 +5,7 @@ import { useWallet } from './ClientOnlyVeChainKit';
 import { vechainSDKTransactionService } from '@/utils/simpleTransactionService';
 import { vechainContractService } from '@/utils/vechainContractService';
 import { QuestionList } from './QuestionList';
+import { QuestionListVariations } from './QuestionListVariations';
 import { AskQuestionModal } from './AskQuestionModal';
 import { useToaster, ToasterNotification } from './ToasterNotification';
 
@@ -20,6 +21,7 @@ interface Question {
   upvotes: number;
   tags: string[];
   timestamp: number;
+  replies: number;
 }
 
 // interface Answer { // Unused
@@ -212,45 +214,51 @@ export function QAInterface() {
       </div>
 
       {/* Questions List */}
-      <div className="bg-gradient-to-br from-gray-800 to-gray-700 rounded-lg shadow-lg border border-gray-600 p-6">
-        <h2 className="text-2xl font-bold text-white mb-4 flex items-center">
+      <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-6 relative overflow-hidden">
+        {/* Animated background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+        <h2 className="text-2xl font-bold text-cyan-300 mb-4 flex items-center relative z-10 font-mono">
           <span className="mr-2">❓</span>
           Community Questions
         </h2>
+      <div className="relative z-10">
         <QuestionList
           questions={questions}
           loading={loading}
           onUpvoteQuestion={handleUpvoteQuestion}
         />
       </div>
+      </div>
 
       {/* Wallet Details */}
-      <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-600 p-4">
-        <h2 className="text-xl font-bold text-white mb-3">
+      <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-4 relative overflow-hidden">
+        {/* Animated background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+        <h2 className="text-xl font-bold text-cyan-300 mb-3 relative z-10 font-mono">
           🎉 Wallet Connected Successfully!
         </h2>
-        <div className="space-y-2">
+        <div className="space-y-2 relative z-10">
           <div>
-            <span className="font-medium text-gray-300">Account:</span>
-            <span className="ml-2 font-mono text-sm bg-gray-700 text-gray-200 px-2 py-1 rounded">
+            <span className="font-medium text-cyan-300 font-mono">Account:</span>
+            <span className="ml-2 font-mono text-sm bg-gray-900 text-cyan-300 px-2 py-1 rounded border border-cyan-400">
               {account}
             </span>
           </div>
           <div>
-            <span className="font-medium text-gray-300">Connection Type:</span>
-            <span className="ml-2 text-sm text-green-400">
+            <span className="font-medium text-cyan-300 font-mono">Connection Type:</span>
+            <span className="ml-2 text-sm text-green-400 font-mono">
               VeWorld Wallet
             </span>
           </div>
           <div>
-            <span className="font-medium text-gray-300">Network:</span>
-            <span className="ml-2 text-sm text-green-400">
+            <span className="font-medium text-cyan-300 font-mono">Network:</span>
+            <span className="ml-2 text-sm text-green-400 font-mono">
               VeChain Testnet
             </span>
           </div>
           <div>
-            <span className="font-medium text-gray-300">Contract Address:</span>
-            <span className="ml-2 font-mono text-xs bg-gray-700 text-gray-200 px-2 py-1 rounded">
+            <span className="font-medium text-cyan-300 font-mono">Contract Address:</span>
+            <span className="ml-2 font-mono text-xs bg-gray-900 text-cyan-300 px-2 py-1 rounded border border-cyan-400">
               0xf331dc138fdc90633c3176b2a9a80e9d2b13a8e2
             </span>
           </div>
@@ -259,20 +267,22 @@ export function QAInterface() {
 
       {/* Platform Stats */}
       {stats && (
-        <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-600 p-4">
-          <h2 className="text-xl font-bold text-white mb-3">Platform Statistics</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="text-center p-3 bg-gray-700 rounded-lg border border-gray-600">
-              <div className="text-2xl font-bold text-blue-400">{stats.totalQuestions}</div>
-              <div className="text-xs text-gray-300">Total Questions</div>
+        <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-4 relative overflow-hidden">
+          {/* Animated background */}
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+          <h2 className="text-xl font-bold text-cyan-300 mb-3 relative z-10 font-mono">Platform Statistics</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 relative z-10">
+            <div className="text-center p-3 bg-gray-900 rounded-lg border border-cyan-400">
+              <div className="text-2xl font-bold text-cyan-400 font-mono">{stats.totalQuestions}</div>
+              <div className="text-xs text-cyan-300 font-mono">Total Questions</div>
             </div>
-            <div className="text-center p-3 bg-gray-700 rounded-lg border border-gray-600">
-              <div className="text-2xl font-bold text-green-400">{stats.totalAnswers}</div>
-              <div className="text-xs text-gray-300">Total Answers</div>
+            <div className="text-center p-3 bg-gray-900 rounded-lg border border-cyan-400">
+              <div className="text-2xl font-bold text-green-400 font-mono">{stats.totalAnswers}</div>
+              <div className="text-xs text-cyan-300 font-mono">Total Answers</div>
             </div>
-            <div className="text-center p-3 bg-gray-700 rounded-lg border border-gray-600">
-              <div className="text-2xl font-bold text-purple-400">{stats.totalUsers}</div>
-              <div className="text-xs text-gray-300">Total Users</div>
+            <div className="text-center p-3 bg-gray-900 rounded-lg border border-cyan-400">
+              <div className="text-2xl font-bold text-purple-400 font-mono">{stats.totalUsers}</div>
+              <div className="text-xs text-cyan-300 font-mono">Total Users</div>
             </div>
           </div>
         </div>
