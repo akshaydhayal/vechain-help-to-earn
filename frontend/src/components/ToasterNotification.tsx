@@ -31,13 +31,13 @@ export function ToasterNotification({
   const getTypeStyles = () => {
     switch (type) {
       case 'success':
-        return 'bg-green-500 text-white border-green-600';
+        return 'bg-black text-green-400 border-2 border-green-400 shadow-2xl shadow-green-400/50';
       case 'error':
-        return 'bg-red-500 text-white border-red-600';
+        return 'bg-black text-red-400 border-2 border-red-400 shadow-2xl shadow-red-400/50';
       case 'info':
-        return 'bg-blue-500 text-white border-blue-600';
+        return 'bg-black text-cyan-400 border-2 border-cyan-400 shadow-2xl shadow-cyan-400/50';
       default:
-        return 'bg-gray-500 text-white border-gray-600';
+        return 'bg-black text-gray-400 border-2 border-gray-400 shadow-2xl shadow-gray-400/50';
     }
   };
 
@@ -60,21 +60,23 @@ export function ToasterNotification({
         isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
       }`}
     >
-      <div className={`px-6 py-4 rounded-lg border shadow-lg max-w-md ${getTypeStyles()}`}>
-        <div className="flex items-center justify-between">
+      <div className={`px-4 py-3 rounded-lg border-2 shadow-lg max-w-md relative overflow-hidden ${getTypeStyles()}`}>
+        {/* Animated background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+        <div className="flex items-center justify-between relative z-10">
           <div className="flex items-center space-x-3">
             <span className="text-lg">{getIcon()}</span>
             <div>
-              <p className="font-semibold text-sm">{message}</p>
+              <p className="font-bold text-sm font-mono">{message}</p>
               {type === 'success' && (
-                <p className="text-xs opacity-90 mt-1">Transaction confirmed on VeChain</p>
+                <p className="text-xs opacity-90 mt-1 font-mono">Transaction confirmed on VeChain</p>
               )}
               {txHash && (
                 <a
                   href={`https://explore-testnet.vechain.org/transactions/${txHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs underline hover:text-gray-200 mt-1 block"
+                  className="text-xs underline hover:opacity-70 mt-1 block font-mono transition-opacity"
                 >
                   View on Explorer →
                 </a>
@@ -86,7 +88,7 @@ export function ToasterNotification({
               setIsVisible(false);
               setTimeout(onClose, 300);
             }}
-            className="ml-4 text-white hover:text-gray-200 transition-colors"
+            className="ml-4 hover:opacity-70 transition-opacity font-mono"
           >
             ✕
           </button>

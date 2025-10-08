@@ -29,13 +29,17 @@ export function QuestionList({ questions, loading, onUpvoteQuestion }: QuestionL
   const router = useRouter();
   if (loading) {
     return (
-      <div className="space-y-3">
+      <div className="space-y-2">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-gray-800 rounded-lg border border-gray-600 p-4 animate-pulse">
-            <div className="h-4 bg-gray-700 rounded w-3/4 mb-2"></div>
-            <div className="h-3 bg-gray-700 rounded w-1/2 mb-3"></div>
-            <div className="h-3 bg-gray-700 rounded w-full mb-2"></div>
-            <div className="h-3 bg-gray-700 rounded w-2/3"></div>
+          <div key={i} className="bg-black border-2 border-cyan-400 rounded-lg p-4 animate-pulse relative overflow-hidden">
+            {/* Animated background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+            <div className="relative z-10">
+              <div className="h-4 bg-cyan-400/30 rounded w-3/4 mb-2"></div>
+              <div className="h-3 bg-cyan-400/30 rounded w-1/2 mb-3"></div>
+              <div className="h-3 bg-cyan-400/30 rounded w-full mb-2"></div>
+              <div className="h-3 bg-cyan-400/30 rounded w-2/3"></div>
+            </div>
           </div>
         ))}
       </div>
@@ -57,7 +61,7 @@ export function QuestionList({ questions, loading, onUpvoteQuestion }: QuestionL
       {questions.map((question) => (
       <div
         key={question.id}
-        className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-4 relative overflow-hidden"
+        className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-2 px-4 relative overflow-hidden"
       >
         {/* Animated background */}
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
@@ -68,10 +72,10 @@ export function QuestionList({ questions, loading, onUpvoteQuestion }: QuestionL
           {/* Line 1: Title and Description */}
           <div className="flex items-start justify-between mb-1">
             <div className="flex-1">
-              <h3 className="text-lg font-bold text-cyan-300 mb-2 font-mono">
+              <h3 className="text-lg font-bold text-cyan-300 mb-0 font-mono">
                 {question.title}
               </h3>
-              <p className="text-gray-300 text-sm leading-relaxed mb-2 font-mono">
+              <p className="text-gray-300 text-sm leading-relaxed mb-0 font-mono">
                 {question.description}
               </p>
             </div>

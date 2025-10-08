@@ -9,7 +9,7 @@ export class VeChainSDKTransactionService {
   private provider: unknown;
 
   constructor() {
-    this.contractAddress = '0xf331dc138fdc90633c3176b2a9a80e9d2b13a8e2'; // Updated contract address with question upvotes, tags, and fixed answer upvoting
+    this.contractAddress = '0x1adafc3c05c0afe2ee195b371cea30a5215be3de'; // Updated contract address with post-approval button removal
     console.log('VeChain SDK transaction service initialized');
     this.initializeVeChainSDK();
   }
@@ -19,7 +19,7 @@ export class VeChainSDKTransactionService {
       // Import VeChain SDK modules dynamically
       const { ThorClient } = await import('@vechain/sdk-network');
       const TESTNET_URL = process.env.VECHAIN_TESTNET_URL || 'https://testnet.vechain.org';
-      const { ABIFunction, Clause, Address, VET } = await import('@vechain/sdk-core');
+      // Removed unused imports to fix build warnings
       
       // Initialize Thor client for testnet
       this.thorClient = ThorClient.at(TESTNET_URL);

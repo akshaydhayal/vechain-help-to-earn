@@ -44,7 +44,10 @@ export const Design1 = ({ questions, loading, onUpvoteQuestion }: QuestionListVa
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-400"></div>
+        <div className="bg-black border-2 border-cyan-400 rounded-lg p-4 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-400 relative z-10"></div>
+        </div>
       </div>
     );
   }
@@ -140,7 +143,10 @@ export const Design2 = ({ questions, loading, onUpvoteQuestion }: QuestionListVa
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-400"></div>
+        <div className="bg-black border-2 border-cyan-400 rounded-lg p-4 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-400 relative z-10"></div>
+        </div>
       </div>
     );
   }
@@ -335,7 +341,10 @@ export const Design4 = ({ questions, loading, onUpvoteQuestion }: QuestionListVa
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-400"></div>
+        <div className="bg-black border-2 border-cyan-400 rounded-lg p-4 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-400 relative z-10"></div>
+        </div>
       </div>
     );
   }
@@ -429,7 +438,10 @@ export const Design5 = ({ questions, loading, onUpvoteQuestion }: QuestionListVa
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-400"></div>
+        <div className="bg-black border-2 border-cyan-400 rounded-lg p-4 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-cyan-400 relative z-10"></div>
+        </div>
       </div>
     );
   }

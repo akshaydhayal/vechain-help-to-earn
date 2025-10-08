@@ -3,12 +3,7 @@
  * Creates a deterministic avatar using the address as seed
  */
 
-interface AvatarConfig {
-  size: number;
-  backgroundColor: string;
-  textColor: string;
-  fontFamily: string;
-}
+// Removed unused interface to fix build warnings
 
 export function generateAvatar(address: string, size: number = 32): string {
   // Create a simple hash from the address

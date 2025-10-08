@@ -2,10 +2,18 @@
 
 import { useWallet } from './ClientOnlyVeChainKit';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { AskQuestionModal } from './AskQuestionModal';
 
-export function Navbar() {
+interface NavbarProps {
+  onAskQuestion?: (title: string, description: string, bounty: string, tags: string[]) => void;
+  isTransactionPending?: boolean;
+}
+
+export function Navbar({ onAskQuestion, isTransactionPending = false }: NavbarProps) {
   const { account, isConnected, connect, disconnect } = useWallet();
   const router = useRouter();
+  const [isAskQuestionOpen, setIsAskQuestionOpen] = useState(false);
 
   const handleLogoClick = () => {
     router.push('/');
@@ -21,6 +29,21 @@ export function Navbar() {
 
   const handleDisconnect = () => {
     disconnect();
+  };
+
+  const handleAskQuestion = (title: string, description: string, bounty: string, tags: string[]) => {
+    if (onAskQuestion) {
+      onAskQuestion(title, description, bounty, tags);
+    }
+    setIsAskQuestionOpen(false);
+  };
+
+  const handleOpenAskQuestion = () => {
+    setIsAskQuestionOpen(true);
+  };
+
+  const handleCloseAskQuestion = () => {
+    setIsAskQuestionOpen(false);
   };
 
   return (
@@ -45,14 +68,22 @@ export function Navbar() {
             </button>
           </div>
 
-
-          {/* Wallet Connection */}
+          {/* Wallet Connection and Ask Question */}
           <div className="flex items-center space-x-4">
             {isConnected ? (
               <div className="flex items-center space-x-3">
                 <div className="text-sm text-cyan-300 font-mono">
                   Connected: {account?.slice(0, 6)}...{account?.slice(-4)}
                 </div>
+                <button
+                  onClick={handleOpenAskQuestion}
+                  className="bg-purple-500 text-white px-3 py-2 rounded border border-purple-400 hover:bg-purple-400 transition-colors text-sm font-bold flex items-center space-x-1"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  <span>Ask Question</span>
+                </button>
                 <button
                   onClick={handleDisconnect}
                   className="bg-red-500 text-black px-4 py-2 rounded border border-red-400 hover:bg-red-400 transition-colors text-sm font-bold"
@@ -71,6 +102,15 @@ export function Navbar() {
           </div>
         </div>
       </div>
+      
+      {/* Ask Question Modal */}
+      <AskQuestionModal
+        isOpen={isAskQuestionOpen}
+        onClose={handleCloseAskQuestion}
+        onSubmit={handleAskQuestion}
+        isTransactionPending={isTransactionPending}
+        currentUser={account || ''}
+      />
     </header>
   );
 }

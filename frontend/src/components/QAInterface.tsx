@@ -5,7 +5,6 @@ import { useWallet } from './ClientOnlyVeChainKit';
 import { vechainSDKTransactionService } from '@/utils/simpleTransactionService';
 import { vechainContractService } from '@/utils/vechainContractService';
 import { QuestionList } from './QuestionList';
-import { QuestionListVariations } from './QuestionListVariations';
 import { AskQuestionModal } from './AskQuestionModal';
 import { useToaster, ToasterNotification } from './ToasterNotification';
 
@@ -24,6 +23,10 @@ interface Question {
   replies: number;
 }
 
+interface QAInterfaceProps {
+  onAskQuestion?: (title: string, description: string, bounty: string, tags: string[]) => void;
+}
+
 // interface Answer { // Unused
 //   id: number;
 //   questionId: number;
@@ -40,7 +43,7 @@ interface PlatformStats {
   totalUsers: string;
 }
 
-export function QAInterface() {
+export function QAInterface({ onAskQuestion }: QAInterfaceProps = {}) {
   const { account, isConnected } = useWallet();
   const [stats, setStats] = useState<PlatformStats | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -96,6 +99,12 @@ export function QAInterface() {
   const handleAskQuestion = async (title: string, description: string, bounty: string, tags: string[]) => {
     if (!title.trim() || !description.trim() || !bounty) {
       alert('Please enter a question title, description, and bounty amount');
+      return;
+    }
+
+    // If onAskQuestion prop is provided, use it instead of the local implementation
+    if (onAskQuestion) {
+      onAskQuestion(title, description, bounty, tags);
       return;
     }
 
@@ -200,27 +209,15 @@ export function QAInterface() {
     <div className="space-y-4 bg-gray-900 min-h-screen">
 
 
-      {/* Ask Question Button */}
-      <div className="mb-4">
-        <button
-          onClick={() => setIsAskQuestionModalOpen(true)}
-          className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-3 rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-600"
-        >
-          <div className="flex items-center justify-center space-x-2">
-            <span className="text-lg">💭</span>
-            <span className="text-base font-semibold">Ask a Question</span>
-          </div>
-        </button>
-      </div>
 
       {/* Questions List */}
       <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-6 relative overflow-hidden">
         {/* Animated background */}
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
-        <h2 className="text-2xl font-bold text-cyan-300 mb-4 flex items-center relative z-10 font-mono">
+        {/* <h2 className="text-2xl font-bold text-cyan-300 mb-4 flex items-center relative z-10 font-mono">
           <span className="mr-2">❓</span>
           Community Questions
-        </h2>
+        </h2> */}
       <div className="relative z-10">
         <QuestionList
           questions={questions}
@@ -231,9 +228,9 @@ export function QAInterface() {
       </div>
 
       {/* Wallet Details */}
-      <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-4 relative overflow-hidden">
+      {/* <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-4 relative overflow-hidden"> */}
         {/* Animated background */}
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+        {/* <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
         <h2 className="text-xl font-bold text-cyan-300 mb-3 relative z-10 font-mono">
           🎉 Wallet Connected Successfully!
         </h2>
@@ -259,30 +256,21 @@ export function QAInterface() {
           <div>
             <span className="font-medium text-cyan-300 font-mono">Contract Address:</span>
             <span className="ml-2 font-mono text-xs bg-gray-900 text-cyan-300 px-2 py-1 rounded border border-cyan-400">
-              0xf331dc138fdc90633c3176b2a9a80e9d2b13a8e2
+              0x1adafc3c05c0afe2ee195b371cea30a5215be3de
             </span>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Platform Stats */}
       {stats && (
         <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-4 relative overflow-hidden">
           {/* Animated background */}
           <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
-          <h2 className="text-xl font-bold text-cyan-300 mb-3 relative z-10 font-mono">Platform Statistics</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 relative z-10">
-            <div className="text-center p-3 bg-gray-900 rounded-lg border border-cyan-400">
-              <div className="text-2xl font-bold text-cyan-400 font-mono">{stats.totalQuestions}</div>
-              <div className="text-xs text-cyan-300 font-mono">Total Questions</div>
-            </div>
-            <div className="text-center p-3 bg-gray-900 rounded-lg border border-cyan-400">
-              <div className="text-2xl font-bold text-green-400 font-mono">{stats.totalAnswers}</div>
-              <div className="text-xs text-cyan-300 font-mono">Total Answers</div>
-            </div>
-            <div className="text-center p-3 bg-gray-900 rounded-lg border border-cyan-400">
-              <div className="text-2xl font-bold text-purple-400 font-mono">{stats.totalUsers}</div>
-              <div className="text-xs text-cyan-300 font-mono">Total Users</div>
+          <div className="text-center relative z-10">
+            <div className="text-sm text-cyan-300 font-mono">
+              Total Questions: <span className="font-bold">{stats.totalQuestions}</span> • 
+              Total Answers: <span className="font-bold">{stats.totalAnswers}</span>
             </div>
           </div>
         </div>
@@ -297,9 +285,13 @@ export function QAInterface() {
 
       {/* Loading Indicator */}
       {loading && (
-        <div className="text-center py-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mx-auto"></div>
-          <p className="mt-2 text-gray-300">Loading...</p>
+        <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-6 relative overflow-hidden">
+          {/* Animated background */}
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+          <div className="text-center py-4 relative z-10">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-400 mx-auto"></div>
+            <p className="mt-2 text-cyan-300 font-mono">Loading platform data...</p>
+          </div>
         </div>
       )}
 

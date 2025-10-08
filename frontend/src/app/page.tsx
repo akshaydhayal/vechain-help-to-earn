@@ -3,16 +3,50 @@
 import { QAInterface } from '@/components/QAInterface';
 import { Navbar } from '@/components/Navbar';
 import { useWallet } from '@/components/ClientOnlyVeChainKit';
+import { useState } from 'react';
+import { vechainSDKTransactionService } from '@/utils/simpleTransactionService';
+import { useToaster, ToasterNotification } from '@/components/ToasterNotification';
 
 export default function Home() {
-  const { isConnected } = useWallet();
+  const { isConnected, account } = useWallet();
+  const [isTransactionPending, setIsTransactionPending] = useState(false);
+  const { notifications, showTransactionSuccess, showTransactionError, removeNotification } = useToaster();
+
+  const handleAskQuestion = async (title: string, description: string, bounty: string, tags: string[]) => {
+    if (!account) {
+      showTransactionError('Please connect your wallet first');
+      return;
+    }
+
+    try {
+      setIsTransactionPending(true);
+      const txHash = await vechainSDKTransactionService.askQuestion(
+        title,
+        description,
+        bounty,
+        tags,
+        account
+      );
+      showTransactionSuccess(txHash);
+      
+      // Reload the page to show the new question
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } catch (err) {
+      console.error('Failed to ask question:', err);
+      showTransactionError(err instanceof Error ? err.message : 'Failed to ask question');
+    } finally {
+      setIsTransactionPending(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
       {/* Animated background */}
       <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
       {/* Common Navbar */}
-      <Navbar />
+      <Navbar onAskQuestion={handleAskQuestion} isTransactionPending={isTransactionPending} />
 
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 relative z-10">
@@ -58,11 +92,23 @@ export default function Home() {
           <div className="space-y-8">
 
                 {/* Q&A Interface */}
-                <QAInterface />
+                <QAInterface onAskQuestion={handleAskQuestion} />
 
           </div>
         )}
       </main>
+      
+      {/* Toaster Notifications */}
+      {notifications.map((notification) => (
+        <ToasterNotification
+          key={notification.id}
+          message={notification.message}
+          type={notification.type}
+          duration={notification.duration}
+          txHash={notification.txHash}
+          onClose={() => removeNotification(notification.id)}
+        />
+      ))}
     </div>
   );
 }

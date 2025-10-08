@@ -25,8 +25,8 @@ export function AskQuestionModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (title.trim() && description.trim() && bounty) {
-      onSubmit(title, description, bounty, tags);
+    if (title.trim() && description.trim()) {
+      onSubmit(title, description, '0.1', tags);
       setTitle('');
       setDescription('');
       setBounty('0.1');
@@ -71,7 +71,7 @@ export function AskQuestionModal({
         {/* Animated background */}
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-cyan-400 relative z-10">
+        <div className="flex items-center justify-between p-2 px-4 border-b border-cyan-400 relative z-10">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-cyan-500 rounded-full flex items-center justify-center border border-cyan-400">
               <span className="text-black font-semibold text-base font-mono">?</span>
@@ -138,7 +138,7 @@ export function AskQuestionModal({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Provide more details about your question..."
-              rows={3}
+              rows={2}
               className="w-full px-3 py-2 bg-gray-900 border border-cyan-400 text-cyan-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent resize-none text-sm font-mono"
               required
             />
@@ -198,30 +198,6 @@ export function AskQuestionModal({
             </div>
           </div>
 
-          {/* Bounty */}
-          <div>
-            <label className="block text-xs font-medium text-cyan-300 mb-1 font-mono">
-              Bounty Amount (VET) *
-            </label>
-            <div className="relative">
-              <input
-                type="number"
-                value={bounty}
-                onChange={(e) => setBounty(e.target.value)}
-                placeholder="0.1"
-                min="0.01"
-                step="0.01"
-                className="w-full px-3 py-2 bg-gray-900 border border-cyan-400 text-cyan-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent text-sm font-mono"
-                required
-              />
-              <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                <span className="text-cyan-400 text-xs font-mono">VET</span>
-              </div>
-            </div>
-            <p className="text-xs text-cyan-400 mt-1 font-mono">
-              Minimum 0.01 VET. Higher bounties attract more attention.
-            </p>
-          </div>
 
           {/* Actions */}
           <div className="flex justify-end space-x-2 pt-3 border-t border-cyan-400">

@@ -293,6 +293,7 @@ contract SimpleQA {
         require(_approver != address(0), "Approver address cannot be zero");
         require(questions[questionId].asker == _approver, "Only question asker can approve answers");
         require(!questions[questionId].hasApprovedAnswer, "Question already has an approved answer");
+        require(answers[_answerId].answerer != _approver, "Cannot approve your own answer");
         
         // Mark answer as approved
         answers[_answerId].isApproved = true;
@@ -319,6 +320,7 @@ contract SimpleQA {
         }
         
         // Distribute VeBetterDAO rewards (only if conditions are met)
+        // Note: If VeBetterDAO fails, the approval will still succeed
         _distributeVeBetterReward(answers[_answerId].answerer);
         
         emit AnswerApproved(_answerId, questionId, answers[_answerId].answerer, questions[questionId].bounty);
@@ -335,6 +337,11 @@ contract SimpleQA {
     
     // Internal function to distribute VeBetterDAO rewards
     function _distributeVeBetterReward(address _answerer) private {
+        // Skip VeBetterDAO rewards if not properly configured
+        if (address(x2EarnRewardsPoolContract) == address(0) || appId == bytes32(0)) {
+            return;
+        }
+        
         require(rewardAmount > 0, "Reward amount must be greater than 0");
         require(
             rewardAmount <= x2EarnRewardsPoolContract.availableFunds(appId),

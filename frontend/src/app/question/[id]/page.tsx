@@ -50,6 +50,35 @@ export default function QuestionPage() {
   
   const { notifications, showTransactionSuccess, showTransactionError, removeNotification } = useToaster();
 
+  const handleAskQuestion = async (title: string, description: string, bounty: string, tags: string[]) => {
+    if (!account) {
+      showTransactionError('Please connect your wallet first');
+      return;
+    }
+
+    try {
+      setIsTransactionPending(true);
+      const txHash = await vechainSDKTransactionService.askQuestion(
+        title,
+        description,
+        bounty,
+        tags,
+        account
+      );
+      showTransactionSuccess(txHash);
+      
+      // Reload the page to show the new question
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } catch (err) {
+      console.error('Failed to ask question:', err);
+      showTransactionError(err instanceof Error ? err.message : 'Failed to ask question');
+    } finally {
+      setIsTransactionPending(false);
+    }
+  };
+
   const loadQuestionData = useCallback(async () => {
     try {
       setLoading(true);
@@ -199,10 +228,16 @@ export default function QuestionPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
-          <p className="text-gray-300">Loading question...</p>
+      <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center">
+        {/* Animated background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+        <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-8 relative overflow-hidden">
+          {/* Animated background */}
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+          <div className="text-center relative z-10">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+            <p className="text-cyan-300 font-mono">Loading question...</p>
+          </div>
         </div>
       </div>
     );
@@ -210,17 +245,23 @@ export default function QuestionPage() {
 
   if (error || !question) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl mb-4">❌</div>
-          <h2 className="text-2xl font-bold text-white mb-2">Question Not Found</h2>
-          <p className="text-gray-300 mb-6">{error || 'The question you are looking for does not exist.'}</p>
-          <button
-            onClick={() => router.push('/')}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Back to Home
-          </button>
+      <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center">
+        {/* Animated background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
+        <div className="bg-black border-2 border-red-400 rounded-lg hover:border-red-300 hover:shadow-2xl hover:shadow-red-400/50 transition-all duration-300 p-8 relative overflow-hidden">
+          {/* Animated background */}
+          <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-purple-500/10 animate-pulse"></div>
+          <div className="text-center relative z-10">
+            <div className="text-6xl mb-4">❌</div>
+            <h2 className="text-2xl font-bold text-red-400 mb-2 font-mono">Question Not Found</h2>
+            <p className="text-gray-300 mb-6 font-mono">{error || 'The question you are looking for does not exist.'}</p>
+            <button
+              onClick={() => router.push('/')}
+              className="bg-cyan-500 text-black px-6 py-3 rounded border border-cyan-400 hover:bg-cyan-400 transition-colors font-bold"
+            >
+              Back to Home
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -229,12 +270,12 @@ export default function QuestionPage() {
   return (
     <div className="min-h-screen bg-gray-900">
       {/* Common Navbar */}
-      <Navbar />
+      <Navbar onAskQuestion={handleAskQuestion} isTransactionPending={isTransactionPending} />
       
       {/* Main Content - Reddit-style layout */}
       <main className="max-w-4xl mx-auto px-4 py-6">
         {/* Question Post - Neon Cyberpunk style */}
-        <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-4 relative overflow-hidden mb-4">
+        <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-2 px-4 relative overflow-hidden mb-4">
           {/* Animated background */}
           <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
           {/* Question Header */}
@@ -257,17 +298,17 @@ export default function QuestionPage() {
             {/* Question Content */}
             <div className="flex-1">
               {/* Question Title */}
-              <h1 className="text-2xl font-bold text-cyan-300 mb-3 font-mono">
+              <h1 className="text-xl font-semibold text-cyan-300 mb-1 font-mono">
                 {question.title}
               </h1>
 
               {/* Question Description */}
-              <div className="text-gray-300 text-base leading-relaxed mb-4 font-mono">
+              <div className="text-gray-300 text-base leading-relaxed mb-1 font-mono">
                 {question.description}
               </div>
 
               {/* Question Tags */}
-              <div className="flex items-center mb-3 flex-wrap gap-1">
+              <div className="flex items-center mb-2 flex-wrap gap-1">
                 {question.tags && question.tags.length > 0 ? (
                   question.tags.map((tag, index) => (
                     <span
@@ -379,6 +420,18 @@ export default function QuestionPage() {
             </div>
           </div>
           
+          {/* Approval Message - Show once for all answers */}
+          {question.asker === account && answers.some(answer => !answer.isApproved) && (
+            <div className="px-4 py-3 bg-green-600/10 border-b border-green-500/30 relative z-10">
+              <div className="flex items-center text-green-400 text-sm">
+                <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                This answer looks helpful? Approve it to mark the question as resolved.
+              </div>
+            </div>
+          )}
+          
           {answers.length === 0 ? (
             <div className="text-center py-8 relative z-10">
               <div className="text-4xl mb-3">💭</div>
@@ -419,28 +472,53 @@ export default function QuestionPage() {
                       )}
                       
                       {/* Answer Meta */}
-                      <div className="flex items-center text-xs text-slate-400 mb-2">
-                        <img 
-                          src={getAvatarForAddress(answer.answerer, 20)} 
-                          alt="User avatar" 
-                          className="w-5 h-5 rounded-full mr-2 ring-1 ring-slate-600/50"
-                        />
-                        <span className="font-medium text-cyan-300 hover:underline cursor-pointer">
-                          {answer.answerer.slice(0, 6)}...{answer.answerer.slice(-4)}
-                        </span>
-                        <span className="mx-1">•</span>
-                        <span className="text-purple-300">{formatTimeAgo(answer.timestamp)}</span>
-                        {answer.isApproved && (
-                          <>
-                            <span className="mx-1">•</span>
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-600/20 text-green-400 border border-green-500/30">
+                      <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
+                        <div className="flex items-center">
+                          <img 
+                            src={getAvatarForAddress(answer.answerer, 20)} 
+                            alt="User avatar" 
+                            className="w-5 h-5 rounded-full mr-2 ring-1 ring-slate-600/50"
+                          />
+                          <span className="font-medium text-cyan-300 hover:underline cursor-pointer">
+                            {answer.answerer.slice(0, 6)}...{answer.answerer.slice(-4)}
+                          </span>
+                          <span className="mx-1">•</span>
+                          <span className="text-purple-300">{formatTimeAgo(answer.timestamp)}</span>
+                          {answer.isApproved && (
+                            <>
+                              <span className="mx-1">•</span>
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-green-600/20 text-green-400 border border-green-500/30">
+                                <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                                Approved
+                              </span>
+                            </>
+                          )}
+                        </div>
+                        
+                        <div className="flex items-center">
+                          {question.asker === account && !answer.isApproved && answer.answerer !== account && !question.hasApprovedAnswer && (
+                            <button
+                              onClick={() => handleApproveAnswer(answer.id)}
+                              disabled={isTransactionPending}
+                              className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
                               <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                               </svg>
-                              Approved
+                              Approve Answer
+                            </button>
+                          )}
+                          {question.asker === account && answer.answerer === account && !question.hasApprovedAnswer && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-600 text-gray-300">
+                              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                              </svg>
+                              Cannot approve your own answer
                             </span>
-                          </>
-                        )}
+                          )}
+                        </div>
                       </div>
 
                       {/* Answer Text */}
@@ -448,55 +526,7 @@ export default function QuestionPage() {
                         {answer.content}
                       </div>
 
-                      {/* Approve Button - Prominent Display */}
-                      {question.asker === account && !answer.isApproved && (
-                        <div className="mb-3 p-3 bg-green-600/10 border border-green-500/30 rounded-lg">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center text-green-400 text-sm">
-                              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                              This answer looks helpful? Approve it to mark the question as resolved.
-                            </div>
-                            <button
-                              onClick={() => handleApproveAnswer(answer.id)}
-                              disabled={isTransactionPending}
-                              className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-                            >
-                              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                              {isTransactionPending ? 'Approving...' : 'Approve Answer'}
-                            </button>
-                          </div>
-                        </div>
-                      )}
 
-                      {/* Answer Actions */}
-                      <div className="flex items-center space-x-4 text-xs text-cyan-300 font-mono">
-                        <button className="hover:text-cyan-200 transition-colors">Reply</button>
-                        <button className="hover:text-cyan-200 transition-colors">Award</button>
-                        <button className="hover:text-cyan-200 transition-colors">Share</button>
-                        <button className="hover:text-cyan-200 transition-colors">⋯</button>
-                        {question.asker === account && !answer.isApproved && (
-                          <button
-                            onClick={() => handleApproveAnswer(answer.id)}
-                            disabled={isTransactionPending}
-                            className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-                          >
-                            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
-                            Approve Answer
-                          </button>
-                        )}
-                        {/* Debug info - remove this later */}
-                        {process.env.NODE_ENV === 'development' && (
-                          <div className="text-xs text-gray-500">
-                            Debug: asker={question.asker?.slice(0,6)}, account={account?.slice(0,6)}, isApproved={answer.isApproved.toString()}
-                          </div>
-                        )}
-                      </div>
                     </div>
                   </div>
                 </div>
