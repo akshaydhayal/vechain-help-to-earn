@@ -72,7 +72,7 @@ export function QuestionList({ questions, loading, onUpvoteQuestion }: QuestionL
           {/* Line 1: Title and Description */}
           <div className="flex items-start justify-between mb-1">
             <div className="flex-1">
-              <h3 className="text-lg font-bold text-cyan-300 mb-0 font-mono">
+              <h3 className="text-lg font-semibold text-cyan-300 mb-0 font-mono">
                 {question.title}
               </h3>
               <p className="text-gray-300 text-sm leading-relaxed mb-0 font-mono">
