@@ -1,4 +1,4 @@
-# 🚀 VeChain Quora - Decentralized Q&A Platform
+# 🚀 VeChain Quora - X-to-Earn Q&A Platform
 
 Live Project Link: [https://vechain-quora.vercel.app/](https://vechain-quora.vercel.app/)
 
