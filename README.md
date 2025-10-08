@@ -56,8 +56,42 @@ vechain-quora/
 └── README.md                   # This file
 ```
 
-## 🚀 Quick Start
+## 🎯 How It Works
 
+### Question Flow
+1. **Ask Questions**: Users post questions with VET bounties and up to 5 custom tags
+2. **Community Answers**: Other users submit answers to questions
+3. **Upvoting**: Community upvotes quality questions and answers
+4. **Answer Approval**: Question asker approves the best answer (cannot be their own)
+5. **Reward Distribution**: Approved answerer receives VET bounty and B3TR tokens
+
+### Security Flow
+1. **Validation**: All actions validated at contract and frontend level
+2. **Error Handling**: Clear error messages for all failure cases
+3. **Transaction Feedback**: Real-time notifications with explorer links
+4. **UI Updates**: Optimistic updates with blockchain confirmation
+
+## 📱 Screenshots & Demo
+
+### Home Page
+*Home Page containing all the questions asked by users*
+![Home Page](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/VeChain-Quora-X-to-Earn-Q-A-Platform%20(2).png)
+*Main question list with upvote functionality*
+
+### UnApproved Question Page
+*Individual question Page that has not been approved yet*
+![Question Detail](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/VeChain-Quora-X-to-Earn-Q-A-Platform%20(1).png)
+
+
+### Approved Question Page
+*Individual question Page that has beed approved by question asker*
+![Notifications](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/VeChain-Quora-X-to-Earn-Q-A-Platform.png)
+
+### Ask Question Modal
+*Question creation with tags, bounty, and validation*
+![Ask Question](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/qq1.png)
+
+## 🚀 Quick Start
 ### Prerequisites
 - Node.js 18+
 - VeWorld Wallet or VeChain-compatible wallet
@@ -111,7 +145,7 @@ vechain-quora/
 
 - **Network**: VeChain Testnet
 - **Latest Contract Address**: `0x1adafc3c05c0afe2ee195b371cea30a5215be3de`
-- **Explorer**: [View on VeChain Explorer](https://explore-testnet.vechain.org/transactions/0x1adafc3c05c0afe2ee195b371cea30a5215be3de)
+- **Explorer**: [View on VeChain Explorer](https://explore-testnet.vechain.org/accounts/0x1adafc3c05c0afe2ee195b371cea30a5215be3de/)
 - **Features**: Self-approval prevention, post-approval locking, VeBetterDAO integration
 
 ## 🛡️ Security Features
@@ -143,39 +177,6 @@ vechain-quora/
    - Core functionality works even if VeBetterDAO is down
    - Optional reward distribution doesn't break approvals
 
-## 🎯 How It Works
-
-### Question Flow
-1. **Ask Questions**: Users post questions with VET bounties and up to 5 custom tags
-2. **Community Answers**: Other users submit answers to questions
-3. **Upvoting**: Community upvotes quality questions and answers
-4. **Answer Approval**: Question asker approves the best answer (cannot be their own)
-5. **Reward Distribution**: Approved answerer receives VET bounty and B3TR tokens
-
-### Security Flow
-1. **Validation**: All actions validated at contract and frontend level
-2. **Error Handling**: Clear error messages for all failure cases
-3. **Transaction Feedback**: Real-time notifications with explorer links
-4. **UI Updates**: Optimistic updates with blockchain confirmation
-
-## 📱 Screenshots & Demo
-
-### Home Page
-![Home Page](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/VeChain-Quora-X-to-Earn-Q-A-Platform%20(2).png)
-*Main question list with upvote functionality*
-
-### UnApproved Question Page
-![Question Detail](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/VeChain-Quora-X-to-Earn-Q-A-Platform%20(1).png)
-*Individual question Page that has not been approved yet*
-
-
-### Approved Question Page
-![Notifications](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/VeChain-Quora-X-to-Earn-Q-A-Platform.png)
-*Individual question Page that has beed approved by question asker*
-
-### Ask Question Modal
-![Ask Question](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/qq1.png)
-*Question creation with tags, bounty, and validation*
 
 ## 🛠️ Technical Implementation
 
@@ -224,37 +225,9 @@ vechain-quora/
 - **Security Features**: 5+ anti-farming mechanisms
 - **Transaction Success Rate**: 99%+ with proper error handling
 
-## 🚀 Deployment
 
-### Frontend Deployment (Vercel)
-1. Connect GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically on git push
-
-### Contract Deployment
-1. Update contract address in frontend services
-2. Verify contract on VeChain Explorer
-3. Test all functionality end-to-end
 
 ## 📄 License
 
 MIT License - see LICENSE file for details.
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## 📞 Support
-
-For issues or questions:
-- Create an issue in the GitHub repository
-- Check the documentation in the `docs/` folder
-- Review the smart contract code for implementation details
-
----
-
-**Built with ❤️ for the VeChain ecosystem**
