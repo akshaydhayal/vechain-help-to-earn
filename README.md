@@ -161,20 +161,21 @@ vechain-quora/
 ## 📱 Screenshots & Demo
 
 ### Home Page
-![Home Page](docs/screenshots/home-page.png)
-*Main question list with cyberpunk theme and upvote functionality*
+![Home Page](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/VeChain-Quora-X-to-Earn-Q-A-Platform%20(2).png)
+*Main question list with upvote functionality*
 
-### Question Detail Page
-![Question Detail](docs/screenshots/question-detail.png)
-*Individual question with answers, approval system, and security features*
+### UnApproved Question Page
+![Question Detail](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/VeChain-Quora-X-to-Earn-Q-A-Platform%20(1).png)
+*Individual question Page that has not been approved yet*
+
+
+### Approved Question Page
+![Notifications](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/VeChain-Quora-X-to-Earn-Q-A-Platform.png)
+*Individual question Page that has beed approved by question asker*
 
 ### Ask Question Modal
-![Ask Question](docs/screenshots/ask-question.png)
+![Ask Question](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/qq1.png)
 *Question creation with tags, bounty, and validation*
-
-### Transaction Notifications
-![Notifications](docs/screenshots/notifications.png)
-*Real-time transaction feedback with VeChain explorer links*
 
 ## 🛠️ Technical Implementation
 
