@@ -7,6 +7,7 @@ import { vechainContractService } from '@/utils/vechainContractService';
 import { QuestionList } from './QuestionList';
 import { AskQuestionModal } from './AskQuestionModal';
 import { useToaster, ToasterNotification } from './ToasterNotification';
+// import { B3TRBalanceFull } from './B3TRBalance';
 
 interface Question {
   id: number;
@@ -58,7 +59,7 @@ export function QAInterface({ onAskQuestion }: QAInterfaceProps = {}) {
   const [isAskQuestionModalOpen, setIsAskQuestionModalOpen] = useState(false);
   
   // Toaster notifications
-  const { notifications, showTransactionSuccess, showTransactionError, removeNotification } = useToaster();
+  const { notifications, showTransactionSuccess, showTransactionError, removeNotification, showRewardNotification } = useToaster();
 
   useEffect(() => {
     if (isConnected && account) {
@@ -161,6 +162,17 @@ export function QAInterface({ onAskQuestion }: QAInterfaceProps = {}) {
       const txHash = await vechainSDKTransactionService.upvoteQuestion(questionId, account);
       showTransactionSuccess(txHash);
       
+      // Find the question asker's address for reward notification
+      const question = questions.find(q => q.id === questionId);
+      const questionAsker = question?.asker;
+      
+      // Show reward notification after transaction success
+      setTimeout(() => {
+        if (questionAsker) {
+          showRewardNotification(questionAsker, "0.05", "question upvote");
+        }
+      }, 6000); // 6 seconds delay to show after tx notification
+      
       // Optimistically update the upvote count immediately
       setQuestions(prevQuestions => 
         prevQuestions.map(q => 
@@ -208,7 +220,22 @@ export function QAInterface({ onAskQuestion }: QAInterfaceProps = {}) {
   return (
     <div className="space-y-4 bg-gray-900 min-h-screen">
 
-
+      {/* Platform Stats */}
+      {stats && (
+        <div className="bg-gradient-to-r from-amber-900 to-orange-900 border-2 border-amber-400 rounded-lg hover:border-amber-300 hover:shadow-2xl hover:shadow-amber-400/50 transition-all duration-300 p-4 relative overflow-hidden">
+          {/* Animated background */}
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-orange-500/20 animate-pulse"></div>
+          <div className="text-center relative z-10">
+            <div className="text-sm text-amber-200 font-mono">
+              Total Questions: <span className="font-bold text-amber-100">{stats.totalQuestions}</span> • 
+              Total Answers: <span className="font-bold text-amber-100">{stats.totalAnswers}</span>
+            </div>
+            <div className="text-xs text-orange-300 font-mono mt-2">
+              🎯 B3TR Rewards: <span className="font-bold text-orange-200">5 B3TR</span> max per question • <span className="font-bold text-orange-200">0.05 B3TR</span> per question upvote (max 10) • <span className="font-bold text-orange-200">0.1 B3TR</span> per answer upvote (max 30)
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Questions List */}
       <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-6 relative overflow-hidden">
@@ -256,28 +283,11 @@ export function QAInterface({ onAskQuestion }: QAInterfaceProps = {}) {
           <div>
             <span className="font-medium text-cyan-300 font-mono">Contract Address:</span>
             <span className="ml-2 font-mono text-xs bg-gray-900 text-cyan-300 px-2 py-1 rounded border border-cyan-400">
-              0x3d61027e97919ae8082a9350d0a24d228947a0cd
+              0x83cf14210d3c4ac5fb8ee101f91583261cf7b17a
             </span>
           </div>
         </div>
       </div> */}
-
-      {/* Platform Stats */}
-      {stats && (
-        <div className="bg-black border-2 border-cyan-400 rounded-lg hover:border-cyan-300 hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 p-4 relative overflow-hidden">
-          {/* Animated background */}
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
-          <div className="text-center relative z-10">
-            <div className="text-sm text-cyan-300 font-mono">
-              Total Questions: <span className="font-bold">{stats.totalQuestions}</span> • 
-              Total Answers: <span className="font-bold">{stats.totalAnswers}</span>
-            </div>
-            <div className="text-xs text-blue-400 font-mono mt-2">
-              🎯 B3TR Rewards: <span className="font-bold">5 B3TR</span> per approved answer
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Error Display */}
       {error && (

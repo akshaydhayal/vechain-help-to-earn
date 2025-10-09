@@ -79,13 +79,11 @@ export function QuestionList({ questions, loading, onUpvoteQuestion }: QuestionL
                 {question.description}
               </p>
             </div>
-            {question.bounty && parseFloat(question.bounty) > 0 && (
-              <div className="ml-4 flex-shrink-0">
-                <div className="bg-green-500 text-black px-2 py-1 rounded border border-green-400 font-bold text-xs">
-                  💰 {question.bounty} VET
-                </div>
+            <div className="ml-4 flex-shrink-0">
+              <div className="bg-blue-500 text-white px-2 py-1 rounded border border-blue-400 font-bold text-xs">
+                🎯 5 B3TR Pool
               </div>
-            )}
+            </div>
           </div>
 
           {/* Line 2: Tags */}

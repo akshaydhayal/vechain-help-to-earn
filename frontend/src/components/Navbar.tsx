@@ -4,6 +4,7 @@ import { useWallet } from './ClientOnlyVeChainKit';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { AskQuestionModal } from './AskQuestionModal';
+// import { B3TRBalanceCompact } from './B3TRBalance';
 
 interface NavbarProps {
   onAskQuestion?: (title: string, description: string, bounty: string, tags: string[]) => void;

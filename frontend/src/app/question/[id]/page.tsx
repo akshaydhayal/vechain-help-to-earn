@@ -48,7 +48,7 @@ export default function QuestionPage() {
   // Answer form state
   const [answerContent, setAnswerContent] = useState('');
   
-  const { notifications, showTransactionSuccess, showTransactionError, removeNotification } = useToaster();
+  const { notifications, showTransactionSuccess, showTransactionError, removeNotification, showRewardNotification } = useToaster();
 
   const handleAskQuestion = async (title: string, description: string, bounty: string, tags: string[]) => {
     if (!account) {
@@ -118,6 +118,15 @@ export default function QuestionPage() {
       );
       
       showTransactionSuccess(txHash);
+      
+      // Check if this is the first answer and show reward notification
+      const isFirstAnswer = answers.length === 0;
+      if (isFirstAnswer) {
+        setTimeout(() => {
+          showRewardNotification(account, "0.5", "first answer");
+        }, 6000); // 6 seconds delay to show after tx notification
+      }
+      
       setAnswerContent('');
       await loadQuestionData(); // Reload to get the new answer
     } catch (err: unknown) {
@@ -135,6 +144,18 @@ export default function QuestionPage() {
       setIsTransactionPending(true);
       const txHash = await vechainSDKTransactionService.upvoteAnswer(answerId, account);
       showTransactionSuccess(txHash);
+      
+      // Find the answerer's address for reward notification
+      const answer = answers.find(a => a.id === answerId);
+      const answerer = answer?.answerer;
+      
+      // Show reward notification after transaction success
+      setTimeout(() => {
+        if (answerer) {
+          showRewardNotification(answerer, "0.1", "answer upvote");
+        }
+      }, 6000); // 6 seconds delay to show after tx notification
+      
       await loadQuestionData(); // Reload to get updated upvote count
     } catch (err: unknown) {
       console.error('Error upvoting answer:', err);
@@ -174,6 +195,18 @@ export default function QuestionPage() {
       
       const txHash = await vechainSDKTransactionService.approveAnswer(answerId, account);
       showTransactionSuccess(txHash);
+      
+      // Find the answerer's address for reward notification
+      const answer = answers.find(a => a.id === answerId);
+      const answerer = answer?.answerer;
+      
+      // Show reward notification after transaction success
+      setTimeout(() => {
+        if (answerer) {
+          showRewardNotification(answerer, "1", "answer approval");
+        }
+      }, 6000); // 6 seconds delay to show after tx notification
+      
       await loadQuestionData(); // Reload to get updated approval status
     } catch (err: unknown) {
       console.error('Error approving answer:', err);
@@ -190,6 +223,16 @@ export default function QuestionPage() {
       setIsTransactionPending(true);
       const txHash = await vechainSDKTransactionService.upvoteQuestion(questionId, account);
       showTransactionSuccess(txHash);
+      
+      // Find the question asker's address for reward notification
+      const questionAsker = question?.asker;
+      
+      // Show reward notification after transaction success
+      setTimeout(() => {
+        if (questionAsker) {
+          showRewardNotification(questionAsker, "0.05", "question upvote");
+        }
+      }, 6000); // 6 seconds delay to show after tx notification
       
       // Optimistically update the upvote count immediately
       setQuestion(prevQuestion => 
@@ -293,6 +336,16 @@ export default function QuestionPage() {
                 </svg>
                 {question.upvotes}
               </button>
+              {question.upvotes > 0 && (
+                <div className="mt-1">
+                  <span className="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-purple-600/20 text-purple-400 border border-purple-500/30">
+                    <svg className="w-2 h-2 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                    </svg>
+                    +0.05 B3TR
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Question Content */}
@@ -345,11 +398,37 @@ export default function QuestionPage() {
                   </div>
                 </div>
                 
-                {question.bounty && parseFloat(question.bounty) > 0 && (
-                  <div className="bg-green-500 text-black px-2 py-1 rounded border border-green-400 font-bold text-xs">
-                    💰 {question.bounty} VET
+                <div className="bg-blue-500 text-white px-2 py-1 rounded border border-blue-400 font-bold text-xs">
+                  🎯 5 B3TR Pool
+                </div>
+              </div>
+              
+              {/* B3TR Reward Breakdown */}
+              <div className="mt-3 bg-gray-900 border border-cyan-400 rounded-lg p-3">
+                <div className="text-xs text-cyan-300 font-mono mb-2">
+                  🎯 B3TR Reward Pool Breakdown:
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                  <div className="flex justify-between">
+                    <span className="text-purple-400">Question Asker:</span>
+                    <span className="text-purple-300">0.5 B3TR (10%)</span>
                   </div>
-                )}
+                  <div className="flex justify-between">
+                    <span className="text-yellow-400">First Answer:</span>
+                    <span className="text-yellow-300">0.5 B3TR (10%)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-blue-400">Approved Answer:</span>
+                    <span className="text-blue-300">1 B3TR (20%)</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-green-400">Upvoted Answers:</span>
+                    <span className="text-green-300">3 B3TR (60%)</span>
+                  </div>
+                </div>
+                <div className="mt-2 text-xs text-gray-400 font-mono">
+                  💡 0.05 B3TR per question upvote (max 10) • 0.1 B3TR per answer upvote (max 30)
+                </div>
               </div>
 
             </div>
@@ -439,7 +518,7 @@ export default function QuestionPage() {
             </div>
           ) : (
             <div className="divide-y divide-cyan-400 relative z-10">
-              {answers.map((answer) => (
+              {answers.map((answer, index) => (
                 <div key={answer.id} className={`p-4 relative z-10 ${answer.isApproved ? 'bg-green-900/20 border-l-4 border-green-500' : ''}`}>
                   <div className="flex items-start space-x-3">
                     {/* Answer Voting - Left Side */}
@@ -455,6 +534,16 @@ export default function QuestionPage() {
                         </svg>
                         {answer.upvotes}
                       </button>
+                      {answer.upvotes > 0 && (
+                        <div className="mt-1">
+                          <span className="inline-flex items-center px-1 py-0.5 rounded text-xs font-medium bg-green-600/20 text-green-400 border border-green-500/30">
+                            <svg className="w-2 h-2 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                            </svg>
+                            +0.1 B3TR
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Answer Content - Right Side */}
@@ -484,6 +573,24 @@ export default function QuestionPage() {
                           </span>
                           <span className="mx-1">•</span>
                           <span className="text-purple-300">{formatTimeAgo(answer.timestamp)}</span>
+                          {index === 0 && (
+                            <>
+                              <span className="mx-1">•</span>
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-yellow-600/20 text-yellow-400 border border-yellow-500/30">
+                                <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                </svg>
+                                First Answer
+                              </span>
+                              <span className="mx-1">•</span>
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-yellow-600/20 text-yellow-400 border border-yellow-500/30">
+                                <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                  <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                                </svg>
+                                +0.5 B3TR
+                              </span>
+                            </>
+                          )}
                           {answer.isApproved && (
                             <>
                               <span className="mx-1">•</span>
@@ -498,7 +605,7 @@ export default function QuestionPage() {
                                 <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                   <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
                                 </svg>
-                                +5 B3TR
+                                +1 B3TR
                               </span>
                             </>
                           )}

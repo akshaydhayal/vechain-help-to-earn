@@ -21,7 +21,27 @@ contract SimpleQA {
     // VeBetterDAO integration
     IX2EarnRewardsPool public x2EarnRewardsPoolContract;
     bytes32 public appId;
-    uint256 public rewardAmount = 5 * 10**18; // 5 B3TR tokens per approved answer
+    // Capped B3TR reward system
+    uint256 public constant MAX_REWARD_PER_QUESTION = 5 * 10**18; // 5 B3TR cap per question
+    
+    // Question pool distribution percentages
+    uint256 public constant QUESTION_ASKER_PERCENTAGE = 10; // 10% for question asker
+    uint256 public constant FIRST_ANSWER_PERCENTAGE = 10;   // 10% for first answerer
+    uint256 public constant APPROVED_ANSWER_PERCENTAGE = 20; // 20% for approved answer
+    uint256 public constant UPVOTED_ANSWERS_PERCENTAGE = 60; // 60% for upvoted answers
+    
+    // Maximum upvotes for rewards
+    uint256 public constant MAX_QUESTION_UPVOTES = 10; // Max 10 upvotes for question
+    uint256 public constant MAX_ANSWER_UPVOTES = 30;   // Max 30 upvotes for answers
+    
+    // Question reward pools
+    mapping(uint256 => uint256) public questionRewardPools; // Reward pool per question
+    mapping(uint256 => uint256) public questionAskerRewards; // Rewards distributed to question asker
+    mapping(uint256 => uint256) public upvotedAnswerRewards; // Rewards distributed to upvoted answers
+    uint256 public totalDistributedRewards; // Track total distributed rewards
+    
+    // Legacy support
+    uint256 public rewardAmount = MAX_REWARD_PER_QUESTION;
     
     // Question structure
     struct Question {
@@ -193,6 +213,9 @@ contract SimpleQA {
             timestamp: block.timestamp
         });
         
+        // Initialize question reward pool
+        initializeQuestionPool(questionCounter);
+        
         users[_asker].questionsAsked++;
         
         emit QuestionAsked(questionCounter, msg.sender, _title, msg.value);
@@ -236,6 +259,16 @@ contract SimpleQA {
         
         users[_answerer].answersGiven++;
         
+        // Check if this is the first answer to the question (bonus reward)
+        bool isFirstAnswer = (answerCounter == 1) || (questions[_questionId].asker != address(0) && questions[_questionId].asker != _answerer);
+        if (isFirstAnswer) {
+        // Distribute B3TR rewards for first answer (capped system)
+        uint256 firstAnswerReward = calculateFirstAnswerReward(_questionId);
+        if (firstAnswerReward > 0) {
+            _distributeVeBetterReward(_answerer, firstAnswerReward, "first_answer");
+        }
+        }
+        
         emit AnswerSubmitted(answerCounter, _questionId, msg.sender, _content);
     }
     
@@ -260,6 +293,13 @@ contract SimpleQA {
         }
         users[answers[_answerId].answerer].reputation += 1;
         
+        // Distribute B3TR rewards for upvoted answers (capped system)
+        uint256 questionId = answers[_answerId].questionId;
+        uint256 upvotedReward = calculateUpvotedAnswerReward(questionId, answers[_answerId].upvotes);
+        if (upvotedReward > 0) {
+            _distributeVeBetterReward(answers[_answerId].answerer, upvotedReward, "answer_upvoted");
+        }
+        
         emit AnswerUpvoted(_answerId, _voter, answers[_answerId].upvotes);
     }
     
@@ -282,6 +322,12 @@ contract SimpleQA {
             });
         }
         users[questions[_questionId].asker].reputation += 1;
+        
+        // Distribute B3TR rewards for upvoted questions (capped system)
+        uint256 askerReward = calculateQuestionAskerReward(_questionId, questions[_questionId].upvotes);
+        if (askerReward > 0) {
+            _distributeVeBetterReward(questions[_questionId].asker, askerReward, "question_upvoted");
+        }
         
         emit QuestionUpvoted(_questionId, _voter, questions[_questionId].upvotes);
     }
@@ -319,9 +365,11 @@ contract SimpleQA {
             _distributeReward(answers[_answerId].answerer, questions[questionId].bounty);
         }
         
-        // Distribute VeBetterDAO rewards (only if conditions are met)
-        // Note: If VeBetterDAO fails, the approval will still succeed
-        _distributeVeBetterReward(answers[_answerId].answerer);
+        // Distribute VeBetterDAO rewards (capped system)
+        uint256 approvedReward = calculateApprovedAnswerReward(questionId);
+        if (approvedReward > 0) {
+            _distributeVeBetterReward(answers[_answerId].answerer, approvedReward, "answer_approved");
+        }
         
         emit AnswerApproved(_answerId, questionId, answers[_answerId].answerer, questions[questionId].bounty);
     }
@@ -336,22 +384,25 @@ contract SimpleQA {
     }
     
     // Internal function to distribute VeBetterDAO rewards
-    function _distributeVeBetterReward(address _answerer) private {
+    // Comprehensive reward distribution system
+    function _distributeVeBetterReward(address _recipient, uint256 _amount, string memory _action) private {
         // Skip VeBetterDAO rewards if not properly configured
         if (address(x2EarnRewardsPoolContract) == address(0) || appId == bytes32(0)) {
             return;
         }
         
-        require(rewardAmount > 0, "Reward amount must be greater than 0");
+        require(_amount > 0, "Reward amount must be greater than 0");
         require(
-            rewardAmount <= x2EarnRewardsPoolContract.availableFunds(appId),
+            _amount <= x2EarnRewardsPoolContract.availableFunds(appId),
             "Insufficient funds in VeBetterDAO rewards pool"
         );
         
         // Create proof string
         string memory proof = string(abi.encodePacked(
-            '{"type":"qa_platform","action":"answer_approved","answerer":"',
-            _toAsciiString(_answerer),
+            '{"type":"qa_platform","action":"',
+            _action,
+            '","recipient":"',
+            _toAsciiString(_recipient),
             '","timestamp":"',
             _uint2str(block.timestamp),
             '"}'
@@ -360,12 +411,100 @@ contract SimpleQA {
         // Call VeBetterDAO to distribute rewards
         x2EarnRewardsPoolContract.distributeReward(
             appId,
-            rewardAmount,
-            _answerer,
+            _amount,
+            _recipient,
             proof
         );
         
-        emit RewardDistributed(_answerer, rewardAmount, proof);
+        emit RewardDistributed(_recipient, _amount, proof);
+    }
+    
+    // Legacy function for approved answers (highest tier)
+    function _distributeVeBetterReward(address _answerer) private {
+        _distributeVeBetterReward(_answerer, MAX_REWARD_PER_QUESTION, "answer_approved");
+    }
+    
+    // Capped reward calculation functions
+    function calculateQuestionCap(uint256 questionId) public view returns (uint256) {
+        uint256 availableRewards = x2EarnRewardsPoolContract.availableFunds(appId);
+        uint256 remaining = availableRewards - totalDistributedRewards;
+        
+        if (remaining == 0) return 0;
+        
+        // Geometric decay: reward = remaining / 10
+        uint256 calculatedReward = remaining / 10;
+        
+        // Cap at 5 B3TR maximum
+        uint256 cappedReward = calculatedReward > MAX_REWARD_PER_QUESTION ? 
+            MAX_REWARD_PER_QUESTION : calculatedReward;
+        
+        // Minimum reward threshold (e.g., 0.1 B3TR)
+        if (cappedReward < 1e17) return 0; // 0.1 B3TR minimum
+        
+        return cappedReward;
+    }
+    
+    function calculateQuestionAskerReward(uint256 questionId, uint256 totalUpvotes) public view returns (uint256) {
+        uint256 questionPool = questionRewardPools[questionId];
+        uint256 maxReward = (questionPool * QUESTION_ASKER_PERCENTAGE) / 100; // 10% of question pool
+        uint256 maxUpvotes = MAX_QUESTION_UPVOTES; // Maximum 10 upvotes for question
+        
+        if (totalUpvotes == 0) return 0;
+        if (totalUpvotes > maxUpvotes) return 0; // No rewards after 10 upvotes
+        
+        // 0.05 B3TR per upvote (0.5 B3TR ÷ 10 upvotes)
+        return maxReward / maxUpvotes; // 0.05 B3TR per upvote
+    }
+    
+    function calculateUpvotedAnswerReward(uint256 questionId, uint256 totalUpvotes) public view returns (uint256) {
+        uint256 questionPool = questionRewardPools[questionId];
+        uint256 maxReward = (questionPool * UPVOTED_ANSWERS_PERCENTAGE) / 100; // 60% of question pool
+        uint256 maxUpvotes = MAX_ANSWER_UPVOTES; // Maximum 30 upvotes for answers
+        
+        if (totalUpvotes == 0) return 0;
+        if (totalUpvotes > maxUpvotes) return 0; // No rewards after 30 upvotes
+        
+        // 0.1 B3TR per upvote (3 B3TR ÷ 30 upvotes)
+        return maxReward / maxUpvotes; // 0.1 B3TR per upvote
+    }
+    
+    function calculateFirstAnswerReward(uint256 questionId) public view returns (uint256) {
+        uint256 questionPool = questionRewardPools[questionId];
+        return (questionPool * FIRST_ANSWER_PERCENTAGE) / 100; // 10% of question pool
+    }
+    
+    function calculateApprovedAnswerReward(uint256 questionId) public view returns (uint256) {
+        uint256 questionPool = questionRewardPools[questionId];
+        return (questionPool * APPROVED_ANSWER_PERCENTAGE) / 100; // 20% of question pool
+    }
+    
+    function initializeQuestionPool(uint256 questionId) internal {
+        uint256 cap = calculateQuestionCap(questionId);
+        questionRewardPools[questionId] = cap;
+        totalDistributedRewards += cap;
+    }
+    
+    // Get VeBetterDAO balance for our app
+    function getVeBetterDAOBalance() public view returns (uint256) {
+        if (address(x2EarnRewardsPoolContract) == address(0) || appId == bytes32(0)) {
+            return 0;
+        }
+        return x2EarnRewardsPoolContract.availableFunds(appId);
+    }
+    
+    // Get question reward pool breakdown
+    function getQuestionRewardBreakdown(uint256 questionId) public view returns (
+        uint256 questionPool,
+        uint256 askerReward,
+        uint256 firstAnswerReward,
+        uint256 approvedAnswerReward,
+        uint256 upvotedAnswersReward
+    ) {
+        questionPool = questionRewardPools[questionId];
+        askerReward = (questionPool * QUESTION_ASKER_PERCENTAGE) / 100;
+        firstAnswerReward = (questionPool * FIRST_ANSWER_PERCENTAGE) / 100;
+        approvedAnswerReward = (questionPool * APPROVED_ANSWER_PERCENTAGE) / 100;
+        upvotedAnswersReward = (questionPool * UPVOTED_ANSWERS_PERCENTAGE) / 100;
     }
     
     // View functions

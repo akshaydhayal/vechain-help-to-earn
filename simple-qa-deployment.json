@@ -1,7 +1,7 @@
 {
-  "contractAddress": "0x3d61027e97919ae8082a9350d0a24d228947a0cd",
+  "contractAddress": "0x83cf14210d3c4ac5fb8ee101f91583261cf7b17a",
   "deployerAddress": "0xdC37d70C79352d6472fd78A5eCCCdA250bcC37d3",
-  "deploymentTime": "2025-10-08T15:16:12.256Z",
+  "deploymentTime": "2025-10-09T02:38:59.226Z",
   "network": "vechain_testnet",
   "contractType": "SimpleQA",
   "veBetterDAO": {
@@ -16,7 +16,7 @@
     "totalUsers": "1",
     "contractBalance": "0.1"
   },
-  "explorerUrl": "https://explore-testnet.vechain.org/transactions/0x3d61027e97919ae8082a9350d0a24d228947a0cd",
+  "explorerUrl": "https://explore-testnet.vechain.org/transactions/0x83cf14210d3c4ac5fb8ee101f91583261cf7b17a",
   "features": [
     "Ask questions with VET bounties",
     "Submit answers to questions",

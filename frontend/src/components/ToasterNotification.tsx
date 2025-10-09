@@ -13,7 +13,7 @@ interface ToasterNotificationProps {
 export function ToasterNotification({ 
   message, 
   type, 
-  duration = 10000, 
+  duration = 5000, 
   onClose,
   txHash 
 }: ToasterNotificationProps) {
@@ -73,7 +73,22 @@ export function ToasterNotification({
                   <p className="text-xs opacity-90 mt-1 font-mono">Transaction confirmed on VeChain</p>
                   {message.includes('approved') && (
                     <p className="text-xs text-blue-400 mt-1 font-mono">
-                      🎉 You earned 5 B3TR tokens for your approved answer!
+                      🎉 You earned 1 B3TR token for your approved answer!
+                    </p>
+                  )}
+                  {message.includes('upvoted') && (
+                    <p className="text-xs text-green-400 mt-1 font-mono">
+                      🎉 You earned 0.1 B3TR token for your upvoted answer!
+                    </p>
+                  )}
+                  {message.includes('question') && (
+                    <p className="text-xs text-purple-400 mt-1 font-mono">
+                      🎉 You earned 0.05 B3TR token for your upvoted question!
+                    </p>
+                  )}
+                  {message.includes('first') && (
+                    <p className="text-xs text-yellow-400 mt-1 font-mono">
+                      🎉 You earned 0.5 B3TR token for your first answer!
                     </p>
                   )}
                 </div>
@@ -131,7 +146,12 @@ export function useToaster() {
 
   const showTransactionSuccess = (txHash: string) => {
     const shortHash = `${txHash.slice(0, 6)}...${txHash.slice(-4)}`;
-    showNotification(`Transaction confirmed! Hash: ${shortHash}`, 'success', 10000, txHash);
+    showNotification(`Transaction confirmed! Hash: ${shortHash}`, 'success', 5000, txHash);
+  };
+
+  const showRewardNotification = (userAddress: string, rewardAmount: string, action: string) => {
+    const shortAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+    showNotification(`${shortAddress} received ${rewardAmount} B3TR tokens for ${action}!`, 'info', 8000);
   };
 
   const showTransactionError = (error: string) => {
@@ -144,6 +164,7 @@ export function useToaster() {
     showNotification,
     removeNotification,
     showTransactionSuccess,
-    showTransactionError
+    showTransactionError,
+    showRewardNotification
   };
 }
