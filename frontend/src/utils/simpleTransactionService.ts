@@ -9,7 +9,7 @@ export class VeChainSDKTransactionService {
   private provider: unknown;
 
   constructor() {
-    this.contractAddress = '0x83cf14210d3c4ac5fb8ee101f91583261cf7b17a'; // Updated contract address with capped B3TR reward system
+    this.contractAddress = '0xab87673a820728a89867bdb5efa0e5aa0ff06a46'; // Updated contract address with capped B3TR reward system
     console.log('VeChain SDK transaction service initialized');
     this.initializeVeChainSDK();
   }

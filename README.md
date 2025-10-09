@@ -11,8 +11,18 @@ A fully decentralized Q&A platform built on VeChain blockchain with advanced ant
 - **Submit Answers** to earn rewards and reputation
 - **Question Upvoting** system for community-driven quality
 - **Answer Approval** system with one approved answer per question
+- **First Answer Recognition** with special tags and rewards
 - **Reputation Tracking** for users based on contributions
 - **Real-time Notifications** with transaction hash links
+
+### 💰 B3TR Token Rewards System
+- **Question Upvotes**: 0.05 B3TR per upvote (max 10 upvotes = 0.5 B3TR)
+- **Answer Upvotes**: 0.1 B3TR per upvote (max 30 upvotes = 3 B3TR)
+- **First Answer**: 0.5 B3TR automatic reward for first answer
+- **Approved Answer**: 1 B3TR automatic reward for approved answer
+- **Proportional Distribution**: 10% question asker, 10% first answer, 20% approved answer, 60% upvoted answers
+- **Dynamic Capping**: Max 5 B3TR per question with geometric decay model
+- **VeBetterDAO Integration**: Real B3TR token distribution
 
 ### 🛡️ Advanced Security & Anti-Farming
 - **Self-Approval Prevention**: Question askers cannot approve their own answers
@@ -28,6 +38,9 @@ A fully decentralized Q&A platform built on VeChain blockchain with advanced ant
 - **Real-time Updates**: Optimistic UI updates with blockchain confirmation
 - **User Avatars**: Unique generated avatars for each wallet address
 - **Interactive Elements**: Hover effects, transitions, and visual feedback
+- **Platform Stats**: Orange/amber themed stats section with real-time metrics
+- **Reward Notifications**: Sequential notifications showing B3TR token earnings
+- **First Answer Tags**: Special recognition for first answers with star icons
 
 ## 🏗️ Project Structure
 
@@ -61,9 +74,11 @@ vechain-quora/
 ### Question Flow
 1. **Ask Questions**: Users post questions with VET bounties and up to 5 custom tags
 2. **Community Answers**: Other users submit answers to questions
-3. **Upvoting**: Community upvotes quality questions and answers
-4. **Answer Approval**: Question asker approves the best answer (cannot be their own)
-5. **Reward Distribution**: Approved answerer receives VET bounty and B3TR tokens
+3. **First Answer Recognition**: First answer gets special tag and 0.5 B3TR reward
+4. **Upvoting**: Community upvotes quality questions and answers (0.05 B3TR per question upvote, 0.1 B3TR per answer upvote)
+5. **Answer Approval**: Question asker approves the best answer (cannot be their own)
+6. **Reward Distribution**: Approved answerer receives VET bounty and 1 B3TR token
+7. **B3TR Notifications**: Sequential notifications show who earned what rewards
 
 ### Security Flow
 1. **Validation**: All actions validated at contract and frontend level
@@ -144,9 +159,40 @@ vechain-quora/
 ## 🔗 Contract Information
 
 - **Network**: VeChain Testnet
-- **Latest Contract Address**: `0x1adafc3c05c0afe2ee195b371cea30a5215be3de`
-- **Explorer**: [View on VeChain Explorer](https://explore-testnet.vechain.org/accounts/0x1adafc3c05c0afe2ee195b371cea30a5215be3de/)
-- **Features**: Self-approval prevention, post-approval locking, VeBetterDAO integration
+- **Latest Contract Address**: `0xab87673a820728a89867bdb5efa0e5aa0ff06a46`
+- **Explorer**: [View on VeChain Explorer](https://explore-testnet.vechain.org/accounts/0xab87673a820728a89867bdb5efa0e5aa0ff06a46/)
+- **Features**: Self-approval prevention, post-approval locking, VeBetterDAO integration, B3TR rewards system
+- **VeBetterDAO App ID**: `0x84fa8dbad98867a7b701a7e4af83cdb6da20b04a335044b82e0445128b67228e`
+- **X2EarnRewardsPool**: `0x5F8f86B8D0Fa93cdaE20936d150175dF0205fB38`
+
+## 💰 B3TR Token Rewards System
+
+### Reward Distribution Model
+The platform implements a sophisticated B3TR token rewards system with the following structure:
+
+#### **Question-Level Rewards (Max 5 B3TR per question)**
+- **Question Asker (10%)**: 0.05 B3TR per upvote (max 10 upvotes = 0.5 B3TR)
+- **First Answer (10%)**: 0.5 B3TR automatic reward for first answer
+- **Approved Answer (20%)**: 1 B3TR automatic reward for approved answer
+- **Upvoted Answers (60%)**: 0.1 B3TR per upvote (max 30 upvotes = 3 B3TR)
+
+#### **Dynamic Capping System**
+- **Geometric Decay**: Rewards decrease proportionally but never reach zero
+- **Question Cap**: `min(Available_Funds / 10, 5 B3TR)` per question
+- **Minimum Threshold**: 0.1 B3TR minimum reward for new questions
+- **Sustainability**: Ensures rewards are available for all questions
+
+#### **VeBetterDAO Integration**
+- **Real B3TR Tokens**: Direct integration with VeBetterDAO X2EarnRewardsPool
+- **App ID**: `0x84fa8dbad98867a7b701a7e4af83cdb6da20b04a335044b82e0445128b67228e`
+- **Treasury**: `0xfbbe9886bb3ead9c66f7f625b7b2776f283c58ba`
+- **Contract**: `0x5F8f86B8D0Fa93cdaE20936d150175dF0205fB38`
+
+#### **User Experience**
+- **Sequential Notifications**: Transaction hash → B3TR reward notifications
+- **Visual Recognition**: First answer tags with star icons
+- **Real-time Updates**: Optimistic UI with blockchain confirmation
+- **Balance Display**: Simulated B3TR balances for testnet compatibility
 
 ## 🛡️ Security Features
 
@@ -184,6 +230,10 @@ vechain-quora/
 - **Solidity 0.8.20** with comprehensive security checks
 - **VeBetterDAO Integration** for B3TR token rewards
 - **VET Bounty Distribution** for approved answers
+- **B3TR Reward System** with proportional distribution and dynamic capping
+- **First Answer Recognition** with automatic rewards
+- **Question Upvote Rewards** with geometric decay model
+- **Answer Upvote Rewards** with capped distribution
 - **User Reputation System** with anti-farming protection
 - **Event Logging** for all major actions
 
@@ -193,6 +243,10 @@ vechain-quora/
 - **Tailwind CSS** with custom cyberpunk theme
 - **Real-time Updates** with optimistic UI
 - **Responsive Design** for all screen sizes
+- **B3TR Balance Display** with simulated testnet balances
+- **Reward Notifications** with sequential B3TR earning notifications
+- **First Answer Tags** with special visual recognition
+- **Platform Stats** with orange/amber themed metrics display
 
 ### Security Implementation
 - **Multi-layer Validation** (contract + frontend)
@@ -224,6 +278,9 @@ vechain-quora/
 - **Active Users**: Reputation-based system
 - **Security Features**: 5+ anti-farming mechanisms
 - **Transaction Success Rate**: 99%+ with proper error handling
+- **B3TR Rewards**: Max 5 B3TR per question with proportional distribution
+- **Reward Categories**: Question upvotes, answer upvotes, first answers, approved answers
+- **VeBetterDAO Integration**: Real B3TR token distribution system
 
 
 

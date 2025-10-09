@@ -283,7 +283,7 @@ export function QAInterface({ onAskQuestion }: QAInterfaceProps = {}) {
           <div>
             <span className="font-medium text-cyan-300 font-mono">Contract Address:</span>
             <span className="ml-2 font-mono text-xs bg-gray-900 text-cyan-300 px-2 py-1 rounded border border-cyan-400">
-              0x83cf14210d3c4ac5fb8ee101f91583261cf7b17a
+              0xab87673a820728a89867bdb5efa0e5aa0ff06a46
             </span>
           </div>
         </div>
