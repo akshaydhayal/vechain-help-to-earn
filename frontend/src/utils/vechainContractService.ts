@@ -11,7 +11,7 @@ export class VeChainContractService {
   private abi: ABIContract<any>;
 
   constructor() {
-    this.contractAddress = '0x1adafc3c05c0afe2ee195b371cea30a5215be3de';
+    this.contractAddress = '0x3d61027e97919ae8082a9350d0a24d228947a0cd';
     const testnetUrl = process.env.VECHAIN_TESTNET_URL || "https://testnet.vechain.org";
     this.thorClient = ThorClient.at(testnetUrl);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

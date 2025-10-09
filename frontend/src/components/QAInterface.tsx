@@ -256,7 +256,7 @@ export function QAInterface({ onAskQuestion }: QAInterfaceProps = {}) {
           <div>
             <span className="font-medium text-cyan-300 font-mono">Contract Address:</span>
             <span className="ml-2 font-mono text-xs bg-gray-900 text-cyan-300 px-2 py-1 rounded border border-cyan-400">
-              0x1adafc3c05c0afe2ee195b371cea30a5215be3de
+              0x3d61027e97919ae8082a9350d0a24d228947a0cd
             </span>
           </div>
         </div>
@@ -271,6 +271,9 @@ export function QAInterface({ onAskQuestion }: QAInterfaceProps = {}) {
             <div className="text-sm text-cyan-300 font-mono">
               Total Questions: <span className="font-bold">{stats.totalQuestions}</span> • 
               Total Answers: <span className="font-bold">{stats.totalAnswers}</span>
+            </div>
+            <div className="text-xs text-blue-400 font-mono mt-2">
+              🎯 B3TR Rewards: <span className="font-bold">5 B3TR</span> per approved answer
             </div>
           </div>
         </div>

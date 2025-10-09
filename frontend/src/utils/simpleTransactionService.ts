@@ -9,7 +9,7 @@ export class VeChainSDKTransactionService {
   private provider: unknown;
 
   constructor() {
-    this.contractAddress = '0x1adafc3c05c0afe2ee195b371cea30a5215be3de'; // Updated contract address with post-approval button removal
+    this.contractAddress = '0x3d61027e97919ae8082a9350d0a24d228947a0cd'; // Updated contract address with real VeBetterDAO integration
     console.log('VeChain SDK transaction service initialized');
     this.initializeVeChainSDK();
   }

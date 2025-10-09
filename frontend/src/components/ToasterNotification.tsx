@@ -69,7 +69,14 @@ export function ToasterNotification({
             <div>
               <p className="font-bold text-sm font-mono">{message}</p>
               {type === 'success' && (
-                <p className="text-xs opacity-90 mt-1 font-mono">Transaction confirmed on VeChain</p>
+                <div>
+                  <p className="text-xs opacity-90 mt-1 font-mono">Transaction confirmed on VeChain</p>
+                  {message.includes('approved') && (
+                    <p className="text-xs text-blue-400 mt-1 font-mono">
+                      🎉 You earned 5 B3TR tokens for your approved answer!
+                    </p>
+                  )}
+                </div>
               )}
               {txHash && (
                 <a

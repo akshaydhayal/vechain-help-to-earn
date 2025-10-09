@@ -8,19 +8,22 @@ async function main() {
   console.log("👤 Deployer:", deployer.address);
   console.log("💰 Balance:", ethers.formatEther(await deployer.provider.getBalance(deployer.address)), "VET");
   
-  // For now, we'll use dummy addresses for VeBetterDAO integration
-  // In a real deployment, you would use the actual VeBetterDAO contract addresses
-  const dummyVeBetterDAO = "0x0000000000000000000000000000000000000000"; // Dummy address
-  const dummyAppId = "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"; // Dummy app ID
+  // VeBetterDAO integration with real addresses
+  const veBetterDAOContract = "0x5F8f86B8D0Fa93cdaE20936d150175dF0205fB38"; // Real X2EarnRewardsPool contract address
+  const officialAppId = "0x84fa8dbad98867a7b701a7e4af83cdb6da20b04a335044b82e0445128b67228e"; // Real app ID from VeBetterDAO
+  const treasuryAddress = "0xfbbe9886bb3ead9c66f7f625b7b2776f283c58ba"; // Treasury address for funding
   
   console.log("\n📝 Deploying SimpleQA contract...");
-  console.log("⚠️  Note: Using dummy VeBetterDAO address for testing");
+  console.log("🔗 VeBetterDAO Integration:");
+  console.log("   App ID:", officialAppId);
+  console.log("   Treasury:", treasuryAddress);
+  console.log("   Contract:", veBetterDAOContract);
   
   // Deploy SimpleQA contract
   const SimpleQA = await ethers.getContractFactory("SimpleQA");
   const simpleQA = await SimpleQA.deploy(
-    dummyVeBetterDAO,
-    dummyAppId
+    veBetterDAOContract,
+    officialAppId
   );
   await simpleQA.waitForDeployment();
   
@@ -62,9 +65,10 @@ async function main() {
     network: "vechain_testnet",
     contractType: "SimpleQA",
     veBetterDAO: {
-      contractAddress: dummyVeBetterDAO,
-      appId: dummyAppId,
-      note: "Using dummy addresses for testing"
+      contractAddress: veBetterDAOContract,
+      appId: officialAppId,
+      treasuryAddress: treasuryAddress,
+      note: "Real VeBetterDAO integration with official app ID"
     },
     platformStats: {
       totalQuestions: totalQuestions.toString(),

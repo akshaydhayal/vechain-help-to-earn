@@ -1,13 +1,14 @@
 {
-  "contractAddress": "0x1adafc3c05c0afe2ee195b371cea30a5215be3de",
+  "contractAddress": "0x3d61027e97919ae8082a9350d0a24d228947a0cd",
   "deployerAddress": "0xdC37d70C79352d6472fd78A5eCCCdA250bcC37d3",
-  "deploymentTime": "2025-10-08T01:54:51.167Z",
+  "deploymentTime": "2025-10-08T15:16:12.256Z",
   "network": "vechain_testnet",
   "contractType": "SimpleQA",
   "veBetterDAO": {
-    "contractAddress": "0x0000000000000000000000000000000000000000",
-    "appId": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
-    "note": "Using dummy addresses for testing"
+    "contractAddress": "0x5F8f86B8D0Fa93cdaE20936d150175dF0205fB38",
+    "appId": "0x84fa8dbad98867a7b701a7e4af83cdb6da20b04a335044b82e0445128b67228e",
+    "treasuryAddress": "0xfbbe9886bb3ead9c66f7f625b7b2776f283c58ba",
+    "note": "Real VeBetterDAO integration with official app ID"
   },
   "platformStats": {
     "totalQuestions": "1",
@@ -15,7 +16,7 @@
     "totalUsers": "1",
     "contractBalance": "0.1"
   },
-  "explorerUrl": "https://explore-testnet.vechain.org/transactions/0x1adafc3c05c0afe2ee195b371cea30a5215be3de",
+  "explorerUrl": "https://explore-testnet.vechain.org/transactions/0x3d61027e97919ae8082a9350d0a24d228947a0cd",
   "features": [
     "Ask questions with VET bounties",
     "Submit answers to questions",
