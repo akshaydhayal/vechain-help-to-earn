@@ -90,21 +90,24 @@ vechain-quora/
 
 ### Home Page
 *Home Page containing all the questions asked by users*
-![Home Page](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/VeChain-Quora-X-to-Earn-Q-A-Platform%20(2).png)
-*Main question list with upvote functionality*
+![Home Page](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/images/home.png)
 
 ### UnApproved Question Page
 *Individual question Page that has not been approved yet*
-![Question Detail](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/VeChain-Quora-X-to-Earn-Q-A-Platform%20(1).png)
+![Question Detail](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/images/unapproved_ques.png)
 
 
 ### Approved Question Page
 *Individual question Page that has beed approved by question asker*
-![Notifications](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/VeChain-Quora-X-to-Earn-Q-A-Platform.png)
+![Notifications](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/images/approved_ques.png)
+
+### All Notifications
+*TX Success, B3TR rewards notification for question upvotes, answer upvotes, approved answer etc*
+![Ask Question](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/images/noti1.jpeg)
 
 ### Ask Question Modal
 *Question creation with tags, bounty, and validation*
-![Ask Question](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/qq1.png)
+![Ask Question](https://github.com/akshaydhayal/vechain-help-to-earn/blob/main/images/ask_modal.png)
 
 ## 🚀 Quick Start
 ### Prerequisites
